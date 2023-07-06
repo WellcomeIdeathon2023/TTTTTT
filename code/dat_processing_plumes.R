@@ -36,7 +36,7 @@ leaflet() %>% addTiles() %>% addRasterImage(x=r)
 df_sf <- df %>% st_as_sf(coords = c("lng","lat"),crs=4326)
 
 
-pts <- readr::read_csv("../../my_home.csv") %>% st_as_sf(coords = c("lon","lat"),crs=4326)
+pts <- readr::read_csv("data/my_home/my_home.csv") %>% st_as_sf(coords = c("lon","lat"),crs=4326)
 
 nbuffer <- 20000
 
@@ -57,63 +57,4 @@ if(num > 0){
 
 leaflet() %>% addTiles() %>% addCircleMarkers(data=sf_out,radius= ~qplume) %>% 
   addMarkers(data=pts,popup = lab) %>% addPolygons(data=buffer,opacity = .01,label="Click on the marker to find out what you can do!")
-
-# Copernicus dataset ------------------------------------------------------
-
-#loading currently not working! 
-
-
-library(ncdf4)
-
-ncpath <- "~/Downloads/"
-nc<-nc_open(ncname)
-nc$var[[1]]
-
-
-names(nc[['var']])
-var1 <- ncvar_get(nc, "xch4", collapse_degen=FALSE)
-var2 <- ncvar_get(nc, "lat_bnds", collapse_degen=FALSE)
-var2 <- ncvar_get(nc, "lat_bnds", collapse_degen=FALSE)
-
-dim_lon <- ncvar_get(nc, "lat_bnds")
-dim_lat <- ncvar_get(nc, "lon_bnds")
-dim_time <- ncvar_get(nc, "time_bnds")
-coords <- as.matrix(expand.grid(dim_lon, dim_lat, dim_time))
-nc_df <- data.frame(cbind(coords, var1))
-names(nc_df) <- c("lon", "lat","time","var1")
-r <- rasterFromXYZ(nc_df %>% filter(time==4748) )
-
-ncname <- "~/Downloads/200301_202006-C3S-L3_GHG-GHG_PRODUCTS-MERGED-MERGED-OBS4MIPS-MERGED-v4.3.nc"  
-r <- raster::stack(ncname,varname="xch4")
-crs(r) <- "+proj=longlat +datum=WGS84 +no_defs"
-#T_array <- ncvar_get(r,r$var[[7]])
-#T <- "xch4"
-
-
-nc <- nc_open(ncname )
-names(nc$var)
-
-#variable's attributes
-ncatt_get(r, T, "long_name")   #long name
-ncatt_get(r, T, "units")       #measure unit
-fillvalue <- ncatt_get(r, T, "_FillValue")  #(optional)  
-
-
-
-leaflet() %>% addTiles()  %>% addRasterImage(x=r[[1]])
-
-
-
-
-
-# CDC Wonder --------------------------------------------------------------
-
-cdc <- read.delim("data/CDC/cdc_extract.txt")[-1] %>% mutate(County.Code = as.character(County.Code))
-cou <- read_sf("data/Boundaries/tl_2020_us_county/tl_2020_us_county.shp") #county data
-cou <- st_centroid(cou)
-cdc <- merge(cou,cdc,by.x="GEOID",by.y="County.Code")
-cdc <- st_transform(cdc, crs = "+proj=longlat +datum=WGS84")
-
-leaflet() %>% addTiles() %>% addCircleMarkers(data=cdc$geometry,radius = as.numeric(cdc$Crude.Rate)/mean(as.numeric(cdc$Crude.Rate),na.rm=TRUE))
-leaflet() %>% addTiles() %>% addCircleMarkers(data=cdc$geometry)
 
