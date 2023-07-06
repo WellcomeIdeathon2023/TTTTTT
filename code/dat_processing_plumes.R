@@ -18,18 +18,18 @@ df <- readxl::read_excel("data/Carbonmapper/carbonmapper_ch4_plumelist_2020_2021
 df %<>% rename(lat = plume_lat, lng = plume_lon)
 df$qplume <-  (df$qplume/max(df$qplume))*10
 
-leaflet() %>% addTiles() %>% addCircleMarkers(data=df,radius= ~qplume)
+#leaflet() %>% addTiles() %>% addCircleMarkers(data=df,radius= ~qplume)
 
 
-leaflet() %>% addTiles() %>% addMarkerClusters(data=df,radius= ~qplume) 
+#leaflet() %>% addTiles() %>% addMarkerClusters(data=df,radius= ~qplume) 
 
 #2. plume image data
-ncpath <- "data/Carbonmapper/carbonmapper_ch4_rgb_geotiffs_2020_2021/ang20200708t192518-3_r1823_c108_ctr.tif"  
-r <- rast(x=ncpath)
-r <- rectify(r) %>% raster()
-r[r==0] <- NA
+#ncpath <- "data/Carbonmapper/carbonmapper_ch4_rgb_geotiffs_2020_2021/ang20200708t192518-3_r1823_c108_ctr.tif"  
+#r <- rast(x=ncpath)
+#r <- rectify(r) %>% raster()
+#r[r==0] <- NA
 
-leaflet() %>% addTiles() %>% addRasterImage(x=r)
+#leaflet() %>% addTiles() %>% addRasterImage(x=r)
 
 
 #compute distance to plumes
@@ -38,7 +38,7 @@ df_sf <- df %>% st_as_sf(coords = c("lng","lat"),crs=4326)
 
 pts <- readr::read_csv("data/my_home/my_home.csv") %>% st_as_sf(coords = c("lon","lat"),crs=4326)
 
-nbuffer <- 20000
+nbuffer <- 100
 
 buffer <- st_buffer(pts, dist = nbuffer)
 sel <- st_within(df_sf,buffer,sparse = F)

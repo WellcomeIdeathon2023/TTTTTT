@@ -4,12 +4,14 @@ library(raster)
 library(magrittr)
 library(dplyr)
 library(sf)
+library(ncdf4)
 
 #read in as raster stack
 nc <- stack("data/Copernicus/200301_202006-C3S-L3_GHG-GHG_PRODUCTS-MERGED-MERGED-OBS4MIPS-MERGED-v4.3.nc",
              varname ="xch4")
 noms <- names(nc)
-
+nc <- projectRaster(nc, crs=4326)
+#writeRaster(nc,"input/copernicus.tif", format="GTiff",overwrite=TRUE)
 #no need to but can write as seperate raster layers
 #for(i in 1:2){
   #r <- nc[[i]] #subset to single raster layer
@@ -60,7 +62,7 @@ p + transition_reveal(date)
 
 
 #Mapping of emissions by continent
-con <- st_read("data/Boundaries/World_Continents.shp") %>% st_simplify(dTolerance = .5)
+con <- st_read("data/Boundaries/World_Continents/World_Continents.shp") %>% st_simplify(dTolerance = .5)
 st_crs(con)
 con <- filter(con,CONTINENT!="Oceania" & CONTINENT != "Antarctica")
 
