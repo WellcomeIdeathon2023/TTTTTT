@@ -8,7 +8,7 @@ library(dplyr)
 library(sf)
 library(ggplot2)
 
-shp <- st_read("/Users/fabian/Downloads/cb_2018_us_state_20m/cb_2018_us_state_20m.shp")
+shp <- st_read("data/Boundaries/cb_2018_us_state_20m/cb_2018_us_state_20m.shp")
 shp <- st_transform(shp,"+proj=longlat +datum=WGS84")
 shp$gas <- rnorm(nrow(shp), mean=.38, sd=.2) #simulate prevalence of gas cook stoves in the US
 shp %<>% mutate(gas_cat = case_when(gas <.3 ~1,
@@ -24,14 +24,14 @@ leaflet() %>% addTiles() %>% addPolygons(data=shp,fillColor= ~col(shp$gas),col="
   addLegend(pal = col, values = shp$gas, group = "circles", position = "bottomleft",title="Households with gas stove")
 
 #cdc dat
-cdc <- read.delim("/Users/fabian/Downloads/Underlying Cause of Death, 2018-2021, Single Race-2.txt")[-1]
+cdc <- read.delim("data/CDC/Underlying Cause of Death, 2018-2021, Single Race-2.txt")[-1]
 cdc$State.Code <- ifelse(nchar(as.character(cdc$State.Code))==1,paste0("0",cdc$State.Code),cdc$State.Code)
 cdc <- merge(shp,cdc,by.x="GEOID",by.y="State.Code")
 cdc$Crude.Rate[cdc$Crude.Rate=="Unreliable"] <- NA
 
 
 #by race
-cdc <- read.delim("/Users/fabian/Downloads/Underlying Cause of Death, 2018-2021, Single Race-3.txt")[-1]
+cdc <- read.delim("data/CDC/Underlying Cause of Death, 2018-2021, Single Race-3.txt")[-1]
 cdc$State.Code <- ifelse(nchar(as.character(cdc$State.Code))==1,paste0("0",cdc$State.Code),cdc$State.Code)
 cdc <- merge(shp,cdc,by.x="GEOID",by.y="State.Code")
 cdc$Crude.Rate[cdc$Crude.Rate=="Unreliable"] <- NA

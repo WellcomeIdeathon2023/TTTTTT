@@ -6,7 +6,7 @@ library(dplyr)
 library(sf)
 
 #read in as raster stack
-nc <- stack("/Users/fabian/Downloads/Ideathon/TTTTTT copy/data/Copernicus/200301_202006-C3S-L3_GHG-GHG_PRODUCTS-MERGED-MERGED-OBS4MIPS-MERGED-v4.3.nc",
+nc <- stack("data/Copernicus/200301_202006-C3S-L3_GHG-GHG_PRODUCTS-MERGED-MERGED-OBS4MIPS-MERGED-v4.3.nc",
              varname ="xch4")
 noms <- names(nc)
 
@@ -21,7 +21,7 @@ noms <- names(nc)
 #leaflet() %>% addTiles()  %>% addRasterImage(x=r)
 
 #extract means over geographies
-st <- st_read("/Users/fabian/Downloads/cb_2018_us_state_20m/cb_2018_us_state_20m.shp") #county data
+st <- st_read("data/Boundaries/cb_2018_us_state_20m/cb_2018_us_state_20m.shp") #county data
 st <- st_transform(st,4326)
 sp <- as_Spatial(st)
 crs(sp)
@@ -60,7 +60,7 @@ p + transition_reveal(date)
 
 
 #Mapping of emissions by continent
-con <- st_read("../../../Downloads/World_Continents/World_Continents.shp") %>% st_simplify(dTolerance = .5)
+con <- st_read("data/Boundaries/World_Continents.shp") %>% st_simplify(dTolerance = .5)
 st_crs(con)
 con <- filter(con,CONTINENT!="Oceania" & CONTINENT != "Antarctica")
 
