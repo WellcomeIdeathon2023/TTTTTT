@@ -9,6 +9,7 @@ library(sf)
 library(shiny)
 library(terra)
 library(stringr)
+library(shinyjs)
 
 
 # Set-up server -----------------------------------------------------------
@@ -123,23 +124,33 @@ plume_ui <- fluidPage(
   )
 )
 
+# Buttons ui -----------------------------------------------------------
+buttons_ui <- fluidRow( align = 'center',
+    column(3, align='center', actionButton("hide_methane_button", "Hide/show methane trends")),
+    column(3, align='center', actionButton("hide_map_button", "Hide/show map")),
+    column(3, align='center', actionButton("hide_health_button", "Hide/show health trends"))
+
+  )
+
 # Copernicus ui -----------------------------------------------------------
 copernicus_ui <- fluidRow(
-  
-  sidebarLayout(
-    sidebarPanel(
-      helpText("Explore methane trends by state using data from copernicus."),
+  conditionalPanel(
+    condition = ("input.hide_methane_button%2 == 0"),
+    sidebarLayout(
+      sidebarPanel(
+        helpText("Explore methane trends by state using data from copernicus."),
+        
+        # have input here for state name 
+        selectInput("coper_state_input", 
+                    label = "Choose a state to display trends for.",
+                    choices = state_names,
+                    selected = state_names[1]),
+        
+      ),
       
-      # have input here for state name 
-      selectInput("coper_state_input", 
-                  label = "Choose a state to display trends for.",
-                  choices = state_names,
-                  selected = state_names[1]),
-      
-    ),
-    
-    mainPanel(
-      plotOutput("state_methane_trend")
+      mainPanel(
+        plotOutput("state_methane_trend")
+      )
     )
   )
 )
@@ -150,21 +161,24 @@ copernicus_ui <- fluidRow(
 
 respiratory_ui <- fluidRow(
   
-  sidebarLayout(
-    sidebarPanel(
-      helpText("Explore death rate by cause and state over time."),
+  conditionalPanel(
+    condition = ("input.hide_health_button%2 == 0"),
+    sidebarLayout(
+        sidebarPanel(
+          helpText("Explore death rate by cause and state over time."),
 
-      selectInput("resp_state", "Choose a state:",
-                  choices = unique(respiratory_by_state$state)),
+          selectInput("resp_state", "Choose a state:",
+                      choices = unique(respiratory_by_state$state)),
 
-      selectInput("resp_cause", "Choose a cause:",
-                  choices = unique(respiratory_by_state$death_cause)),
+          selectInput("resp_cause", "Choose a cause:",
+                      choices = unique(respiratory_by_state$death_cause)),
 
-    ),
+        ),
 
-    mainPanel(
-      plotOutput("deathPlot")
-    )
+        mainPanel(
+          plotOutput("deathPlot")
+        )
+      )
   )
 )
 
@@ -172,20 +186,22 @@ respiratory_ui <- fluidRow(
 
 
 mh_ui <- fluidRow(
-  
-  sidebarLayout(
-    sidebarPanel(
-      helpText("See stress and anxiety trends across the country."),
+  conditionalPanel(
+    condition = ("input.hide_map_button%2 == 0"),
+    sidebarLayout(
+      sidebarPanel(
+        helpText("See stress and anxiety trends across the country."),
 
-      selectInput("stress_anxiety", "Stress or anxiety?",
-                  choices = c("Stress", "Anxiety")),
+        selectInput("stress_anxiety", "Stress or anxiety?",
+                    choices = c("Stress", "Anxiety")),
 
-      selectInput("mh_years", "Select a time period:",
-                  choices = c("3-year trend", "5-year trend")),
-    ),
+        selectInput("mh_years", "Select a time period:",
+                    choices = c("3-year trend", "5-year trend")),
+      ),
 
-    mainPanel(
-      leafletOutput("mh_map")
+      mainPanel(
+        leafletOutput("mh_map")
+      )
     )
   )
 )
@@ -195,15 +211,17 @@ mh_ui <- fluidRow(
 # Main ui -----------------------------------------------------------------
 ui <- navbarPage(
   "ME-thane Dashboard",
+  useShinyjs(),
   tabPanel("Methane leaks", plume_ui),
   tabPanel(
     "Methane and respiratory trends", 
     fluidPage(
+      buttons_ui,
       copernicus_ui, 
+      mh_ui,
       respiratory_ui
     )
-  ),
-  tabPanel("Mental health trends", mh_ui)
+  )
 )
 
 
@@ -342,15 +360,8 @@ server <- function(input, output) {
     leaflet() %>% addTiles() %>% addPolygons(data=mh_processed(),fillColor= ~colscale()(normalised_change()),col="white",weight=1) %>%
     addLegend(pal =colscale(), values =normalised_change(), group = "circles", position = "bottomleft",title="Trends in mental health per 100,000 people")
   })
-  
+
 }
 
 # Run the app ----
 shinyApp(ui = ui, server = server)
-
-
-
-
-
-
-
