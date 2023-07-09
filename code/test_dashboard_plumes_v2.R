@@ -6,7 +6,8 @@ library(magrittr)
 library(dplyr)
 library(sf)
 library(shiny)
-
+library(mapview)
+library(htmlwidgets)
 
 #pre processing plumes 
 
@@ -17,10 +18,12 @@ df$qplume <-  (df$qplume/max(df$qplume))*10
 #compute distance to plumes
 df_sf <- df %>% st_as_sf(coords = c("lng","lat"),crs=4326)
 
-### -------
+### ShinyDashboard -------
 
 
-# Define UI
+
+# UI  ---------------------------------------------------------------------
+
 
 ui <- navbarPage(
   "ME-thane Dashboard",
@@ -32,13 +35,14 @@ ui <- navbarPage(
                  includeCSS("styles.css"),
                  includeScript("gomap.js")
                ),
-               
-               leafletOutput("map",heigh="100%"),
+               leafletOutput("map",height="100%"),
+               textOutput("test"),
                absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
                              draggable = TRUE, top = 120, left = "auto", right = 20, bottom = "auto",
                              width = 330, height = "auto",
                              sliderInput("nbuffer","Search for leaks. Set radius in km:", min = 1, max = 100, value = 12, step = 1),
-                             fileInput("upload", NULL, buttonLabel = "Upload CSV", multiple = FALSE,accept=".csv")
+                             numericInput("lat", "Lat", NA),
+                             numericInput("lon", "Lon", NA)
                #print("Cook stove use and respiratory disease Rates per 100k across US States (2018-2020)"),
            )
           )
@@ -49,20 +53,27 @@ ui <- navbarPage(
 
 
 
+# Server ------------------------------------------------------------------
+
 
 # Define server
 server <- function(input, output, session) {
+  
+  
   # Read raster
   
   #if file uploaded, replace pts
   
   pt0 <- readr::read_csv("../data/my_home/my_home.csv") %>% st_as_sf(coords = c("lon","lat"),crs=4326)
-  #pts <- reactive({ pt0})
+  
+
   
   #if file uploaded, replace pts
   pts <- reactive({
-    if(!is.null(input$upload)){
-    pts <- vroom::vroom(input$upload$datapath, delim = ",") %>% as.data.frame() %>%  st_as_sf(coords = c("lon","lat"),crs=4326)
+    if(!is.na(input$lon)){
+      pts <- matrix(data=c(input$lon,input$lat),1,2) %>% as.data.frame()
+      names(pts) <- c("lon","lat")
+      pts %<>% st_as_sf(coords = c("lon","lat"),crs=4326)
     }else{
     pts <- pt0
     }
@@ -85,15 +96,21 @@ server <- function(input, output, session) {
   }
   })
   
+
+# Get map from hover ------------------------------------------------------
+
   
-  #output$test <- renderTable(vroom::vroom(input$upload$datapath, delim = ",") %>% as.data.frame() %>%  
-                             #st_as_sf(coords = c("lon","lat"),crs=4326))
+ observeEvent(input$lon>0, {
+    proxy <- leafletProxy("map")
+    proxy %>% clearMarkers() # Clear existing markers
+   proxy %>%  addTiles() %>% addCircleMarkers(data=sf_out(),radius= sf_out()$qplume) %>% addScaleBar() %>% addMeasure(primaryLengthUnit ="meters") %>%
+      addMarkers(data=pts(),popup =  lab(),layerId = 10) %>% addPolygons(data=buffer(),opacity = .01)
+    })
   
-  # Render Leaflet map
+# Render map --------------------------------------------------------------
   output$map <- renderLeaflet({
     leaflet() %>% addTiles() %>% addCircleMarkers(data=sf_out(),radius= sf_out()$qplume) %>% addScaleBar() %>% addMeasure(primaryLengthUnit ="meters") %>%
-    addMarkers(data=pts(),popup =  lab()) %>% addPolygons(data=buffer(),opacity = .01,label="Click on the marker to find out what you can do!")
-    
+    addMarkers(data=pts(),popup =  lab(),layerId = 10) %>% addPolygons(data=buffer(),opacity = .01)
   })
 }
 
