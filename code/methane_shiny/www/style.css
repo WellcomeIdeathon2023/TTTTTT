@@ -1,7 +1,15 @@
 body {
-   font-family: Avenir;
+   font-family: Avenir, sans-serif;
 }
 
 h1 {
+  font-family: Futura;
+}
+
+h2 {
+  font-family: Futura;
+}
+
+h3 {
   font-family: Futura;
 }
