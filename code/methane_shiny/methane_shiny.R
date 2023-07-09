@@ -212,15 +212,32 @@ mh_ui <- fluidRow(
 # Main ui -----------------------------------------------------------------
 ui <- navbarPage(
   "ME-thane Dashboard",
-  useShinyjs(),
+  useShinyjs(), # allows show/hide
+  tags$head(
+    tags$link(rel = "stylesheet", type = "text/css", href = "style.css")
+  ), # allows custom styles
   tabPanel("Methane leaks", plume_ui),
   tabPanel(
     "Methane and respiratory trends", 
-    fluidPage(
-      buttons_ui,
-      copernicus_ui, 
-      mh_ui,
-      respiratory_ui
+    fluidRow(
+      column(1),
+      column(
+        10,
+        h1("Explore methane and health data-sets"),
+        p("We bring together data from:"),
+        a("The Copernicus Climate data store,", href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/satellite-methane?tab=overview"), br(),
+        a("The Centers for Disease Control and Prevention (CDC) WONDER,", href="https://wonder.cdc.gov/ucd-icd10-expanded.html"), br(),
+        a("The Substance Abuse and Mental Health Services Adminstration (SAMHSA) data store", href="https://www.samhsa.gov/data/data-we-collect/mh-cld-mental-health-client-level-data"), br(),
+        p("There are many limitations to these data-sets. They have very different spatial and temporal coverage, as well as granularities. Both data from the CDC and SAMHSA focus on the United states of America."),
+        p("However, despite these differences, they also share similar structures, capturing information along spatial and temporal axes.The purpose of this platform is to explore how we can begin to bring together these different sources of data to facilitate research into the relationship between methane and health."),
+        h3("Choose which data views to show:"),
+        buttons_ui,
+        hr(),
+        copernicus_ui, 
+        mh_ui,
+        respiratory_ui
+      ),
+      column(1),
     )
   )
 )
