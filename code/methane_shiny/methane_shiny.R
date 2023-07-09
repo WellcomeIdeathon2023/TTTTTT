@@ -118,7 +118,7 @@ copernicus_ui <- fluidRow(
                   selected = state_names[1]),
       
       dateRangeInput("coper_date_range", 
-                  label = "Time range of interest:",
+                  label = "Choose a time range:",
                   start = min(out_long$date),
                   end = max(out_long$date))
     ),
@@ -144,7 +144,11 @@ respiratory_ui <- fluidRow(
 
       selectInput("resp_cause", "Choose a cause:",
                   choices = unique(respiratory_by_state$death_cause)),
-
+      
+      dateRangeInput("resp_date_range", 
+                     label = "Choose a time range:",
+                     start = min(respiratory_by_state$month), 
+                     end = max(respiratory_by_state$month))
     ),
 
     mainPanel(
@@ -221,25 +225,30 @@ server <- function(input, output) {
   
   # Update UI
   output$state_methane_trend <- renderPlot(
-    ggplot( coperInput() ) + geom_line(aes(x=date,y=val)) + theme_linedraw() +
-      ggtitle( paste("Average methane concentration in", input$coper_state_input, input$coper_date_range[1], "-", input$coper_date_range[2] ) )
+    ggplot( coperInput() ) + geom_line(aes(x=date,y=val)) +
+      labs(x = "Date", y = "Methane concentration", 
+           title = paste("Average methane concentration in", input$coper_state_input, input$coper_date_range[1], "-", input$coper_date_range[2] ) 
+      ) +
+      theme_minimal()
   )
   
   # Respiratory functionality --------------------- 
+  # Reactive variables
+  respInput <- reactive({
+    filtered_data <- subset(
+      respiratory_by_state, 
+      (state == input$resp_state) & (death_cause == input$resp_cause) & (month >= input$resp_date_range[1] ) & (month <= input$resp_date_range[2] )
+      )
+    return(filtered_data)
+  })
   
-  
-  
+  # Update UI
   output$deathPlot <- renderPlot({ # TODO: change some of this to reactive variables
-    
-    filtered_data <- subset(respiratory_by_state, 
-                            state == input$resp_state & death_cause == input$resp_cause)
-    
-    
-    ggplot(filtered_data, aes(x = month, y = rate)) +
+    ggplot(respInput(), aes(x = month, y = rate)) +
       geom_line() +
       geom_ribbon(aes(ymin = ci_lower, ymax = ci_upper), alpha = 0.2) +
       geom_smooth(method = "loess", se = TRUE, color = "red3", fill = "pink", alpha = 0.6) +
-      labs(x = "Month", y = "Death Rate", 
+      labs(x = "Date", y = "Death Rate", 
            title = paste("Death rate from", input$resp_cause, 
                          "and 95% confidence interval over time in", input$resp_state),
            fill = "95% Confidence Interval") +
