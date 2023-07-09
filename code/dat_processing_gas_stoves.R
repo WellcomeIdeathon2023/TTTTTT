@@ -23,11 +23,7 @@ col <- colorQuantile("YlOrRd",shp$gas)
 leaflet() %>% addTiles() %>% addPolygons(data=shp,fillColor= ~col(shp$gas),col="white",weight=1) %>%
   addLegend(pal = col, values = shp$gas, group = "circles", position = "bottomleft",title="Households with gas stove")
 
-#cdc dat
-cdc <- read.delim("data/CDC/Underlying Cause of Death, 2018-2021, Single Race-2.txt")[-1]
-cdc$State.Code <- ifelse(nchar(as.character(cdc$State.Code))==1,paste0("0",cdc$State.Code),cdc$State.Code)
-cdc <- merge(shp,cdc,by.x="GEOID",by.y="State.Code")
-cdc$Crude.Rate[cdc$Crude.Rate=="Unreliable"] <- NA
+
 
 
 #by race
