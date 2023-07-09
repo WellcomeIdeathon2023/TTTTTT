@@ -3,13 +3,17 @@ library(dplyr)
 library(epiR)
 library(ggplot2)
 library(leaflet)
+library(leaflet.minicharts)
 library(magrittr)
 library(raster)
 library(sf)
+library(scales)
 library(shiny)
-library(terra)
 library(stringr)
 library(shinyjs)
+library(terra)
+library(tidyverse)
+
 
 
 # Set-up server -----------------------------------------------------------
@@ -26,8 +30,10 @@ ANXIETY_DATA <- "../../data/Processed/anxietycomplete_state.csv"
 MH_POPULATIONS <- "../../data/state_populations.csv"
 STATES_SHAPEFILE <- "../../data/Boundaries/cb_2018_us_state_20m/cb_2018_us_state_20m.shp"
 POPULATION_DATA <- "../../data/CDC/population_state_year.txt"
-
-
+STOVE_SHAPEFILE <- "../../data/Boundaries/cb_2018_us_state_20m/cb_2018_us_state_20m.shp"
+CDC_1 <- "../../data/CDC/Underlying Cause of Death, 2018-2021, Single Race-4.txt"
+CDC_2 <- "../../data/CDC/Underlying Cause of Death, 2018-2021, Single Race-5.txt"
+CDC_3 <- "../../data/CDC/Underlying Cause of Death, 2018-2021, Single Race-6.txt"
 
 # Copernicus set-up --------------------------------------------------------------
 
@@ -50,6 +56,38 @@ df_sf <- df %>% st_as_sf(coords = c("lng","lat"),crs=4326)
 pt0 <- readr::read_csv(HOME_CSV) %>% st_as_sf(coords = c("lon","lat"),crs=4326)
 
 
+# Stove set-up ------------------------------------------------------------
+
+stove_shp <- st_read(STOVE_SHAPEFILE)
+stove_shp <- st_transform(stove_shp,"+proj=longlat +datum=WGS84")
+stove_shp$gas <- rnorm(nrow(stove_shp), mean=.38, sd=.1) #simulate prevalence of gas cook stoves in the US
+stove_shp %<>% mutate(gas_cat = case_when(gas <.3 ~1,
+                                    gas >= .3 & gas <.6 ~2,
+                                    gas >.6 ~3
+)) %>% filter(NAME!="Hawaii" & NAME!="Alaska" )
+stove_shp$gas_cat <- as.factor(stove_shp$gas_cat)
+levels(stove_shp$gas_cat) <- c("<30%","30-60%","60+%")
+
+
+#cdc data
+cdc <- read.delim(CDC_1)[-1] %>% na.omit() %>% 
+  mutate(Crude.Rate = as.character(Crude.Rate)) %>% filter(Gender.Code != "")
+cdc2 <- read.delim(CDC_2)[-1] %>% na.omit() 
+cdc3 <- read.delim(CDC_3)[-1] %>% na.omit() 
+cdc$group <- "gender"; cdc$val <- paste0("Gender - ",cdc$Gender)
+cdc2$group <- "race"; cdc2$val <- paste0("Race - ",cdc2$Single.Race.6)
+cdc3$group <- "children (1-14)"; cdc3$val <- paste0("Age - children (1-14)")
+cdc <- bind_rows(cdc,cdc2,cdc3)
+
+cdc$State.Code <- ifelse(nchar(as.character(cdc$State.Code))==1,paste0("0",cdc$State.Code),cdc$State.Code)
+cdc <- merge(stove_shp %>% filter(NAME != "Hawaii"),cdc,by.x="GEOID",by.y="State.Code") %>% st_centroid()
+cdc$Crude.Rate[cdc$Crude.Rate=="Unreliable"] <- NA
+cdc$Crude.Rate <- cdc$Crude.Rate %>% as.numeric()
+cdc <- cdc %>% mutate(long = unlist(map(cdc$geometry,1)), #get coords
+                      lat = unlist(map(cdc$geometry,2)))
+cdc$geometry <- NULL
+
+col <- colorQuantile("YlOrRd",cdc$gas)
 
 # Respiratory set-up ------------------------------------------------------
 
@@ -211,6 +249,28 @@ mh_ui <- fluidRow(
 
 
 
+# Stove UI ----------------------------------------------------------------
+
+stove_ui <- div(
+  class="outer",
+    
+  tags$head(
+    # Include our custom CSS
+    includeCSS("../styles.css"),
+    includeScript("../gomap.js")
+  ),
+  
+  leafletOutput("stove_map",height="100%"),
+  absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
+                draggable = TRUE, top = 120, left = "auto", right = 20, bottom = "auto",
+                width = 330, height = "auto",
+                selectInput(inputId="filter",label="Select group:" ,choices = c("gender","race","children (1-14)"),selected ="race"),
+                plotOutput("stove_plot2",height=300*0.8 ,width = 300 ),
+                plotOutput("stove_plot3",height=200 ,width = 300 )
+  )
+
+)
+
 # Main ui -----------------------------------------------------------------
 ui <- navbarPage(
   "ME-thane Dashboard",
@@ -241,7 +301,8 @@ ui <- navbarPage(
       ),
       column(1),
     )
-  )
+  ),
+  tabPanel("Indoor air pollution", stove_ui),
 )
 
 
@@ -398,6 +459,71 @@ server <- function(input, output) {
     leaflet() %>% addTiles() %>% addPolygons(data=mh_processed(),fillColor= ~colscale()(normalised_change()),col="white",weight=1) %>%
     addLegend(pal =colscale(), values =normalised_change(), group = "circles", position = "bottomleft",title="Trends in mental health per 100,000 people")
   })
+  
+
+# Stove functionality -----------------------------------------------------
+
+  cdc2 <- reactive({
+    cdc <- cdc %>% filter(group==input$filter)
+    cdc2 <- cdc %>% dplyr::select(NAME,long,lat,val,Crude.Rate) %>% pivot_wider(names_from = val,  values_from = Crude.Rate) %>% dplyr::select(-1)  
+  })
+  
+  
+  content <- paste(sep = "<br/>",
+                   "<b>Is there a relationship between cooking with gas and respiratory diseases (such as asthma)?</b></b></b>",
+                   "Some evidence suggests that gas stoves emit toxic chemicals that can be inhaled and increase disease risk, especically for vulnerable populations such as children.</b></b>",
+                   "You can explore if there is a relationship between the proportion of households using gas stoves and the rate of respiratory disases (2018-2021) at the US-state level."
+  )
+  
+  
+  # Render Leaflet map
+  output$stove_map <- renderLeaflet({
+    leaflet() %>% addTiles() %>% 
+      setView(-88,47,  zoom = 4.4) %>%
+      addPolygons(data=stove_shp,fillColor= ~col(stove_shp$gas),col="white",weight=1,label =  paste0(round(stove_shp$gas*100,0),"% of households use gas stoves in ",stove_shp$NAME)) %>%
+      addLegend(pal = col, values = stove_shp$gas, group = "circles", position = "bottomleft",title="Households with gas stove") %>%
+      addPopups(-104,50.5,content,options=popupOptions(closeButton = T)) %>%
+      addMinicharts(lng=cdc2()$long,lat=cdc2()$lat,chartdata = cdc2() %>% dplyr::select(-c(1:2)),type="pie",
+                    height=10,maxValues=1,
+                    width = 15 * (rowSums(cdc2() %>% dplyr::select(-c(1:2)),na.rm = T)/(max(cdc2() %>% dplyr::select(-c(1:2)),na.rm=TRUE))),
+                    legendPosition = "bottomright"
+      )
+  })
+  
+  # Render plots
+  pdf <- reactive({ cdc %>% filter(group ==input$filter)})
+  
+  #plot 2
+  output$stove_plot2 <- renderPlot({
+    p <- ggplot(data=pdf(),
+                aes(y=Crude.Rate,x=gas,group=val,col=val)) + 
+      geom_point() + geom_smooth(method="lm",se =F) + 
+      xlab("Prop. of households with gas \nstove per US State") + ylab("Rate per 100k")+
+      scale_colour_discrete(type=d3.schemeCategory10)+
+      ggtitle("Rate and gas stove use",
+              subtitle = paste0("By ",input$filter, ", relationship at US-state level"))+
+      theme_linedraw()
+    p + theme(text=element_text(size=15),legend.position = "none")
+  })
+  
+  #plot 3
+  output$stove_plot3 <- renderPlot({
+    p3 <- ggplot(data=pdf(),
+                 aes(y=Crude.Rate,x=val,fill=val)) + 
+      geom_col(position = position_dodge(width = 0.9)) +theme_linedraw()+
+      xlab("Group") + ylab("Disease rate per 100k")+
+      scale_fill_discrete(type=d3.schemeCategory10)+
+      scale_x_discrete(labels = label_wrap(8))+ #wrap labels
+      ggtitle(paste0("Rate per state by ",input$filter))+
+      theme_linedraw()
+    p3 + theme(text=element_text(size=15),legend.position = "none")
+    
+    
+    
+  })
+  
+  
+  
 
 }
 
