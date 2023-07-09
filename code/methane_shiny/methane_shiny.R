@@ -31,11 +31,12 @@ POPULATION_DATA <- "../../data/CDC/population_state_year.txt"
 # Copernicus set-up --------------------------------------------------------------
 
 # load processed data
-load(file = COPERNICUS_DATA)
+load(file = COPERNICUS_DATA) # create out_long df
 # get state names
 state_names <- sort(unique(out_long$NAME))
+# get minimum and maximum dates
 
-# Methane set-up --------------------------------------------------------------
+# Plume finder set-up --------------------------------------------------------------
 
 df <- readxl::read_excel(METHANE_DATA,sheet=2)
 df %<>% rename(lat = plume_lat, lng = plume_lon)
@@ -136,6 +137,10 @@ copernicus_ui <- fluidRow(
                   choices = state_names,
                   selected = state_names[1]),
       
+      dateRangeInput("coper_date_range", 
+                  label = "Time range of interest:",
+                  start = min(out_long$date),
+                  end = max(out_long$date))
     ),
     
     mainPanel(
