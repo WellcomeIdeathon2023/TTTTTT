@@ -82,19 +82,6 @@ respiratory_by_state <- subset(respiratory_by_state,
 
 respiratory_by_state$month <- as.Date(respiratory_by_state$month, format = "%Y/%m/%d")
 
-# set up graphing variables
-
-resp_breaks <- as.Date(c("2018-03-31", "2018-06-30", "2018-09-30", "2018-12-31",
-                         "2019-03-31", "2019-06-30", "2019-09-30", "2019-12-31", 
-                         "2020-03-31", "2020-06-30", "2020-09-30", "2020-12-31",
-                         "2021-03-31", "2021-06-30", "2021-09-30", "2021-12-31"), 
-                       format = "%Y-%m-%d")
-
-resp_labels <- c("3/18", "6/18", "9/18", "12/18",
-                 "3/19", "6/19", "9/19", "12/19",
-                 "3/20", "6/20", "9/20", "12/20",
-                 "3/21", "6/21", "9/21", "12/21")
-
 
 # UI ----------------------------------------------------------------------
 
@@ -126,7 +113,7 @@ copernicus_ui <- fluidRow(
       
       # have input here for state name 
       selectInput("coper_state_input", 
-                  label = "Choose a state to display trends for.",
+                  label = "Choose a state:",
                   choices = state_names,
                   selected = state_names[1]),
       
@@ -226,15 +213,16 @@ server <- function(input, output) {
   
   # Copernicus functionality ---------------
   # Reactive variables
-  stateInput <- reactive({
-    state_data <-out_long[out_long$NAME==input$coper_state_input,] # select rows
-    return(state_data)
+  coperInput <- reactive({
+    state_data <- out_long[out_long$NAME==input$coper_state_input,] # select rows relating to the state
+    time_data <- state_data[ (state_data$date >= input$coper_date_range[1] ) & (state_data$date <= input$coper_date_range[2] ),  ] # select rows within the time range
+    return(time_data)
   })
   
   # Update UI
   output$state_methane_trend <- renderPlot(
-    ggplot( stateInput() ) + geom_line(aes(x=date,y=val)) + theme_linedraw() +
-      ggtitle( paste("Average methane concentration in", input$coper_state_input, "(2003-2016)" ) )
+    ggplot( coperInput() ) + geom_line(aes(x=date,y=val)) + theme_linedraw() +
+      ggtitle( paste("Average methane concentration in", input$coper_state_input, input$coper_date_range[1], "-", input$coper_date_range[2] ) )
   )
   
   # Respiratory functionality --------------------- 
@@ -251,7 +239,6 @@ server <- function(input, output) {
       geom_line() +
       geom_ribbon(aes(ymin = ci_lower, ymax = ci_upper), alpha = 0.2) +
       geom_smooth(method = "loess", se = TRUE, color = "red3", fill = "pink", alpha = 0.6) +
-      scale_x_date(breaks = resp_breaks, labels = resp_labels, date_minor_breaks = "1 month") +
       labs(x = "Month", y = "Death Rate", 
            title = paste("Death rate from", input$resp_cause, 
                          "and 95% confidence interval over time in", input$resp_state),
