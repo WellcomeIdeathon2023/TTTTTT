@@ -25,19 +25,30 @@ df_sf <- df %>% st_as_sf(coords = c("lng","lat"),crs=4326)
 ui <- navbarPage(
   "ME-thane Dashboard",
   tabPanel("Methane leaks",
-  fluidPage(
-  sidebarLayout(
-    sidebarPanel(width = 3,
-      sliderInput("nbuffer","Search for leaks. Set radius in km:", min = 1, max = 100, value = 12, step = 1),
-      fileInput("upload", NULL, buttonLabel = "Upload CSV", multiple = FALSE,accept=".csv")
-    ),
-    mainPanel(
-      leafletOutput("map")#
-        )
-      )
+           div(class="outer",
+               
+               tags$head(
+                 # Include our custom CSS
+                 includeCSS("styles.css"),
+                 includeScript("gomap.js")
+               ),
+               
+               leafletOutput("map",heigh="100%"),
+               absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
+                             draggable = TRUE, top = 120, left = "auto", right = 20, bottom = "auto",
+                             width = 330, height = "auto",
+                             sliderInput("nbuffer","Search for leaks. Set radius in km:", min = 1, max = 100, value = 12, step = 1),
+                             fileInput("upload", NULL, buttonLabel = "Upload CSV", multiple = FALSE,accept=".csv")
+               #print("Cook stove use and respiratory disease Rates per 100k across US States (2018-2020)"),
+           )
+          )
+    )
   )
-)
-)
+
+
+
+
+
 
 # Define server
 server <- function(input, output, session) {
