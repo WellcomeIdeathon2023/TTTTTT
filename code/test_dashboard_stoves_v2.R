@@ -21,8 +21,6 @@ shp$gas_cat <- as.factor(shp$gas_cat)
 levels(shp$gas_cat) <- c("<30%","30-60%","60+%")
 
 
-col <- colorQuantile("YlOrRd",cdc$gas)
-
 
 #cdc data
 cdc <- read.delim("../data/CDC/Underlying Cause of Death, 2018-2021, Single Race-4.txt")[-1] %>% na.omit() %>% 
@@ -41,6 +39,8 @@ cdc$Crude.Rate <- cdc$Crude.Rate %>% as.numeric()
 cdc <- cdc %>% mutate(long = unlist(map(cdc$geometry,1)), #get coords
                       lat = unlist(map(cdc$geometry,2)))
 cdc$geometry <- NULL
+
+col <- colorQuantile("YlOrRd",cdc$gas)
 ### -------
 
 
@@ -58,13 +58,13 @@ ui <- navbarPage(
                  includeScript("gomap.js")
                ),
                
-               leafletOutput("map",height="100%"),
+               leafletOutput("stove_map",height="100%"),
            absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
                          draggable = TRUE, top = 120, left = "auto", right = 20, bottom = "auto",
                          width = 330, height = "auto",
                          selectInput(inputId="filter",label="Select group:" ,choices = c("gender","race","children (1-14)"),selected ="race"),
-                         plotOutput("plot2",height=300*0.8 ,width = 300 ),
-                         plotOutput("plot3",height=200 ,width = 300 )
+                         plotOutput("stove_plot2",height=300*0.8 ,width = 300 ),
+                         plotOutput("stove_plot3",height=200 ,width = 300 )
                )
                  #print("Cook stove use and respiratory disease Rates per 100k across US States (2018-2020)"),
              )
@@ -76,7 +76,7 @@ server <- function(input, output, session) {
 
 cdc2 <- reactive({
   cdc <- cdc %>% filter(group==input$filter)
-  cdc2 <- cdc %>% select(NAME,long,lat,val,Crude.Rate) %>% pivot_wider(names_from = val,  values_from = Crude.Rate) %>% select(-1)  
+  cdc2 <- cdc %>% dplyr::select(NAME,long,lat,val,Crude.Rate) %>% pivot_wider(names_from = val,  values_from = Crude.Rate) %>% dplyr::select(-1)  
 })
   
 
@@ -88,15 +88,15 @@ content <- paste(sep = "<br/>",
 
 
   # Render Leaflet map
-  output$map <- renderLeaflet({
+  output$stove_map <- renderLeaflet({
     leaflet() %>% addTiles() %>% 
       setView(-88,47,  zoom = 4.4) %>%
       addPolygons(data=shp,fillColor= ~col(shp$gas),col="white",weight=1,label =  paste0(round(shp$gas*100,0),"% of households use gas stoves in ",shp$NAME)) %>%
       addLegend(pal = col, values = shp$gas, group = "circles", position = "bottomleft",title="Households with gas stove") %>%
       addPopups(-104,50.5,content,options=popupOptions(closeButton = T)) %>%
-      addMinicharts(lng=cdc2()$long,lat=cdc2()$lat,chartdata = cdc2() %>% select(-c(1:2)),type="pie",
+      addMinicharts(lng=cdc2()$long,lat=cdc2()$lat,chartdata = cdc2() %>% dplyr::select(-c(1:2)),type="pie",
                     height=10,maxValues=1,
-                    width = 15 * (rowSums(cdc2() %>% select(-c(1:2)),na.rm = T)/(max(cdc2() %>% select(-c(1:2)),na.rm=TRUE))),
+                    width = 15 * (rowSums(cdc2() %>% dplyr::select(-c(1:2)),na.rm = T)/(max(cdc2() %>% dplyr::select(-c(1:2)),na.rm=TRUE))),
                     legendPosition = "bottomright"
                     )
   })
@@ -105,7 +105,7 @@ content <- paste(sep = "<br/>",
   pdf <- reactive({ cdc %>% filter(group ==input$filter)})
   
   #plot 2
-  output$plot2 <- renderPlot({
+  output$stove_plot2 <- renderPlot({
   p <- ggplot(data=pdf(),
          aes(y=Crude.Rate,x=gas,group=val,col=val)) + 
     geom_point() + geom_smooth(method="lm",se =F) + 
@@ -118,7 +118,7 @@ content <- paste(sep = "<br/>",
   })
   
   #plot 3
-  output$plot3 <- renderPlot({
+  output$stove_plot3 <- renderPlot({
   p3 <- ggplot(data=pdf(),
                  aes(y=Crude.Rate,x=val,fill=val)) + 
       geom_col(position = position_dodge(width = 0.9)) +theme_linedraw()+
