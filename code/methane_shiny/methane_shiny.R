@@ -8,6 +8,7 @@ library(raster)
 library(sf)
 library(shiny)
 library(terra)
+library(stringr)
 
 
 # Set-up server -----------------------------------------------------------
@@ -19,7 +20,13 @@ COPERNICUS_DATA <- "../../data/Processed/copernicus_long.Rdata"
 METHANE_DATA <- "../../data/Carbonmapper/carbonmapper_ch4_plumelist_2020_2021.xls"
 HOME_CSV <- "../../data/my_home/my_home.csv"
 RESPIRATORY_DATA <- "../../data/CDC/respiratory.txt"
+STRESS_DATA <- "../../data/Processed/traumacomplete_state.csv"
+ANXIETY_DATA <- "../../data/Processed/anxietycomplete_state.csv"
+MH_POPULATIONS <- "../../data/state_populations.csv"
+STATES_SHAPEFILE <- "../../data/Boundaries/cb_2018_us_state_20m/cb_2018_us_state_20m.shp"
 POPULATION_DATA <- "../../data/CDC/population_state_year.txt"
+
+
 
 # Copernicus set-up --------------------------------------------------------------
 
@@ -157,6 +164,29 @@ respiratory_ui <- fluidRow(
   )
 )
 
+# Mental health UI ----------------------------------------------------------
+
+
+mh_ui <- fluidRow(
+  
+  sidebarLayout(
+    sidebarPanel(
+      helpText("See stress and anxiety trends across the country."),
+
+      selectInput("stress_anxiety", "Stress or anxiety?",
+                  choices = c("Stress", "Anxiety")),
+
+      selectInput("mh_years", "Select a time period:",
+                  choices = c("3-year trend", "5-year trend")),
+    ),
+
+    mainPanel(
+      leafletOutput("mh_map")
+    )
+  )
+)
+
+
 
 # Main ui -----------------------------------------------------------------
 ui <- navbarPage(
@@ -168,10 +198,9 @@ ui <- navbarPage(
       copernicus_ui, 
       respiratory_ui
     )
-  )
+  ),
+  tabPanel("Mental health trends", mh_ui)
 )
-
-
 
 
 # Define server logic ----
@@ -242,8 +271,7 @@ server <- function(input, output) {
     return(filtered_data)
   })
   
-  # Update UI
-  output$deathPlot <- renderPlot({ # TODO: change some of this to reactive variables
+  output$deathPlot <- renderPlot({ 
     ggplot(respInput(), aes(x = month, y = rate)) +
       geom_line() +
       geom_ribbon(aes(ymin = ci_lower, ymax = ci_upper), alpha = 0.2) +
@@ -255,9 +283,76 @@ server <- function(input, output) {
       theme_minimal()
   })
 
-  
+  # Mental health functionality --------------------- 
+
+  shp <- st_read(STATES_SHAPEFILE)
+  shp <- st_transform(shp,"+proj=longlat +datum=WGS84")
+
+  state_pops <- read.csv(MH_POPULATIONS, header=TRUE, stringsAsFactors = FALSE)
+  state_pops <- state_pops[order(state_pops$state_code),]
+
+  # Reactive variables
+  mh_trendtime <- reactive({
+    if(input$mh_years == "3-year trend"){
+      mh_trendtime <- 3
+    }else{
+      mh_trendtime <- 5
+    }
+    return(mh_trendtime)
+  })
+
+  mh_processed <- reactive({
+    if(input$stress_anxiety == "Stress"){
+      mh_data <- read.csv(STRESS_DATA)
+    }else{
+      mh_data <- read.csv(ANXIETY_DATA)
+    }
+    mh_data$GEOID <- str_pad(mh_data$GEOID, 2, pad = "0")
+    shp_merged <- merge(shp, mh_data, by.x="GEOID", by.y="GEOID", all=TRUE)
+    shp_merged <- shp_merged[order(shp_merged$GEOID),]
+
+    shp_merged <- shp_merged[-c(53), ]
+    col_name_2020<-colnames(mh_data)[grepl(toString(2020),colnames(mh_data))][1]
+    col_name_past<-colnames(mh_data)[grepl(toString(2021-mh_trendtime()[1]),colnames(mh_data))][1]
+
+    shp_merged$normalised_change <- (shp_merged[[col_name_2020]] - shp_merged[[col_name_past]]) / as.numeric(state_pops$population) * 100000
+
+    shp_merged %<>% mutate(mh_cat = case_when(normalised_change < -5000 ~1,
+                                      normalised_change >= -5000 & normalised_change < -4000 ~2,
+                                      normalised_change >= -4000 & normalised_change < -3000 ~3,
+                                      normalised_change >= -3000 & normalised_change < -2000 ~4,
+                                      normalised_change >= -2000 & normalised_change < -1000 ~5,
+                                      normalised_change >= -1000 & normalised_change <0 ~6,
+                                      normalised_change >= 0 & normalised_change <1000 ~7,
+                                      normalised_change >= 1000 & normalised_change <2000 ~8,
+                                      normalised_change >= 2000 & normalised_change <3000 ~9,
+                                      normalised_change >= 3000 & normalised_change <4000 ~10,
+                                      normalised_change >= 4000 & normalised_change <5000 ~11,
+                                      normalised_change > 5000 ~12
+                                      ))
+
+    shp_merged$mh_cat <- as.factor(shp_merged$mh_cat)
+    levels(shp_merged$mh_cat) <- c("<-5000", "-5000 - -4000","-4000 - -3000","-3000 - -2000", "-2000 - -1000","-1000 - 0","0-1000","1000-2000","2000-3000", "3000-4000", "4000-5000", "5000+")
+    return(shp_merged)
+  })
+
+  normalised_change <- reactive({mh_processed()$normalised_change})
+
+  colscale <- reactive({colorNumeric("YlOrRd", normalised_change())})
+
+  output$mh_map <- renderLeaflet({
+    leaflet() %>% addTiles() %>% addPolygons(data=mh_processed(),fillColor= ~colscale()(normalised_change()),col="white",weight=1) %>%
+    addLegend(pal =colscale(), values =normalised_change(), group = "circles", position = "bottomleft",title="Trends in mental health per 100,000 people")
+  })
   
 }
 
 # Run the app ----
 shinyApp(ui = ui, server = server)
+
+
+
+
+
+
+
