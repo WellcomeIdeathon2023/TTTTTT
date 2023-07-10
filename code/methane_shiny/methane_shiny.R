@@ -262,9 +262,10 @@ ui <- navbarPage(
     ),
     column(1),
   ),
-  tabPanel("Methane leaks", plume_ui),
+  tabPanel("Leaks near you", plume_ui),
+  tabPanel("Healthier homes", stove_ui),
   tabPanel(
-    "Methane and respiratory trends", 
+    "Healthcare needs planner", 
     fluidRow(
       column(1),
       column(
@@ -279,7 +280,6 @@ ui <- navbarPage(
       column(1),
     )
   ),
-  tabPanel("Indoor air pollution", stove_ui),
 )
 
 
@@ -498,11 +498,9 @@ server <- function(input, output) {
     
     
   })
-  
-  
-  
 
 }
 
 # Run the app ----
 shinyApp(ui = ui, server = server)
+
