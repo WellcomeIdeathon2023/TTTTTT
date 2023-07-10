@@ -160,16 +160,19 @@ buttons_ui <- fluidRow( align = 'center',
 
   )
 
-# Copernicus ui -----------------------------------------------------------
+# Copernicus + respiratory ui -----------------------------------------------------------
 copernicus_ui <- fluidRow(
 
   conditionalPanel(
     condition = ("input.hide_methane_button%2 == 0"),
     sidebarLayout(
       sidebarPanel(
-      helpText("Explore methane trends by state using data from copernicus."),
+      helpText("Explore methane and mortality trends by cause, state and time."),
       
       # have input here for state name 
+      selectInput("resp_cause", "Choose a cause:",
+                  choices = unique(respiratory_by_state$death_cause)),
+      
       selectInput("coper_state_input", 
                   label = "Choose a state:",
                   choices = state_names,
@@ -182,46 +185,13 @@ copernicus_ui <- fluidRow(
     ),
       
       mainPanel(
-        plotOutput("state_methane_trend")
+        column(6, plotOutput("state_methane_trend")),
+        column(6, plotOutput("deathPlot")),
       )
     )
   )
 )
 
-
-# Respiratory ui ----------------------------------------------------------
-
-
-respiratory_ui <- fluidRow(
-  
-  conditionalPanel(
-    condition = ("input.hide_health_button%2 == 0"),
-    sidebarLayout(
-        sidebarPanel(
-          helpText("Explore death rate by cause and state over time."),
-
-          selectInput("resp_state", "Choose a state:",
-                      choices = unique(respiratory_by_state$state)),
-
-
-          selectInput("resp_cause", "Choose a cause:",
-                  choices = unique(respiratory_by_state$death_cause)),
-      
-          dateRangeInput("resp_date_range", 
-                     label = "Choose a time range:",
-                     start = min(respiratory_by_state$month), 
-                     end = max(respiratory_by_state$month))
-        ),
-
-      
-
-
-        mainPanel(
-          plotOutput("deathPlot")
-        )
-      )
-  )
-)
 
 # Mental health UI ----------------------------------------------------------
 
@@ -278,6 +248,20 @@ ui <- navbarPage(
   tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "style.css")
   ), # allows custom styles
+  tabPanel("Overview", 
+    column(1),
+    column(
+     10,
+     h1("Explore methane and health data-sets"),
+     p("We bring together data from:"),
+     a("The Copernicus Climate data store,", href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/satellite-methane?tab=overview"), br(),
+     a("The Centers for Disease Control and Prevention (CDC) WONDER,", href="https://wonder.cdc.gov/ucd-icd10-expanded.html"), br(),
+     a("The Substance Abuse and Mental Health Services Adminstration (SAMHSA) data store", href="https://www.samhsa.gov/data/data-we-collect/mh-cld-mental-health-client-level-data"), br(),
+     p("There are many limitations to these data-sets. They have very different spatial and temporal coverage, as well as granularities. Both data from the CDC and SAMHSA focus on the United states of America."),
+     p("However, despite these differences, they also share similar structures, capturing information along spatial and temporal axes.The purpose of this platform is to explore how we can begin to bring together these different sources of data to facilitate research into the relationship between methane and health."),
+    ),
+    column(1),
+  ),
   tabPanel("Leaks near you", plume_ui),
   tabPanel("Healthier homes", stove_ui),
   tabPanel(
@@ -287,18 +271,11 @@ ui <- navbarPage(
       column(
         10,
         h1("Explore methane and health data-sets"),
-        p("We bring together data from:"),
-        a("The Copernicus Climate data store,", href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/satellite-methane?tab=overview"), br(),
-        a("The Centers for Disease Control and Prevention (CDC) WONDER,", href="https://wonder.cdc.gov/ucd-icd10-expanded.html"), br(),
-        a("The Substance Abuse and Mental Health Services Adminstration (SAMHSA) data store", href="https://www.samhsa.gov/data/data-we-collect/mh-cld-mental-health-client-level-data"), br(),
-        p("There are many limitations to these data-sets. They have very different spatial and temporal coverage, as well as granularities. Both data from the CDC and SAMHSA focus on the United states of America."),
-        p("However, despite these differences, they also share similar structures, capturing information along spatial and temporal axes.The purpose of this platform is to explore how we can begin to bring together these different sources of data to facilitate research into the relationship between methane and health."),
         h3("Choose which data views to show:"),
         buttons_ui,
         hr(),
         copernicus_ui, 
         mh_ui,
-        respiratory_ui
       ),
       column(1),
     )
@@ -370,8 +347,9 @@ server <- function(input, output) {
   # Update UI
   output$state_methane_trend <- renderPlot(
     ggplot( coperInput() ) + geom_line(aes(x=date,y=val)) +
+      xlim(input$coper_date_range[1],input$coper_date_range[2]) + 
       labs(x = "Date", y = "Methane concentration", 
-           title = paste("Average methane concentration in", input$coper_state_input, input$coper_date_range[1], "-", input$coper_date_range[2] ) 
+           title = paste("Average methane concentration") 
       ) +
       theme_minimal()
   )
@@ -381,7 +359,7 @@ server <- function(input, output) {
   respInput <- reactive({
     filtered_data <- subset(
       respiratory_by_state, 
-      (state == input$resp_state) & (death_cause == input$resp_cause) & (month >= input$resp_date_range[1] ) & (month <= input$resp_date_range[2] )
+      (state == input$coper_state_input) & (death_cause == input$resp_cause) & (month >= input$coper_date_range[1] ) & (month <= input$coper_date_range[2] )
       )
     return(filtered_data)
   })
@@ -390,10 +368,9 @@ server <- function(input, output) {
     ggplot(respInput(), aes(x = month, y = rate)) +
       geom_line() +
       geom_ribbon(aes(ymin = ci_lower, ymax = ci_upper), alpha = 0.2) +
-      geom_smooth(method = "loess", se = TRUE, color = "red3", fill = "pink", alpha = 0.6) +
+      xlim(input$coper_date_range[1],input$coper_date_range[2]) +
       labs(x = "Date", y = "Death Rate", 
-           title = paste("Death rate from", input$resp_cause, 
-                         "and 95% confidence interval over time in", input$resp_state),
+           title = paste("Death rate (95% C.I.) from\n", input$resp_cause),
            fill = "95% Confidence Interval") +
       theme_minimal()
   })
