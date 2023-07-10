@@ -22,27 +22,6 @@ out_long <- out %>%
                values_to = "val")
 out_long$date <- ymd(substring(out_long$date, 2))
 
-# create 3 and 5 year summaries
-coper_shape$meth3 <- out_long %>% 
-  filter(date >= as.Date("2018-01-01") & date <= as.Date("2020-12-31")) %>%
-  group_by(NAME) %>% summarise(val = mean(val,na.rm=T)) %>% dplyr::pull(val)
-
-coper_shape$meth5 <- out_long %>% 
-  filter(date >= as.Date("2016-01-01") & date <= as.Date("2020-12-31")) %>%
-  group_by(NAME) %>% summarise(val = mean(val,na.rm=T)) %>% dplyr::pull(val)
-
-
-col <- colorQuantile("YlOrRd",coper_shape$meth)
-
-coper_shape2 <- filter(coper_shape,NAME!="Hawaii" & NAME != "Alaska")
-
-#
-leaflet() %>% addTiles() %>% addPolygons(data=coper_shape2,fillColor= ~col(coper_shape2$meth3 ),col="white",weight=1) %>%
-  addLegend(pal = col, values = coper_shape2$meth3 , group = "circles", position = "bottomleft",title="Methan emissions")
-
-leaflet() %>% addTiles() %>% addPolygons(data=coper_shape2,fillColor= ~col(coper_shape2$meth5 ),col="white",weight=1) %>%
-  addLegend(pal = col, values = coper_shape2$meth5 , group = "circles", position = "bottomleft",title="Methan emissions") %>% addRasterImage(x=yrm5)
-
 
 # save out_long for quick reading in
-save(out_long, coper_shape2, file = "../data/Processed/copernicus_long.Rdata")
+save(out_long, file = "../data/Processed/copernicus_long.Rdata")
