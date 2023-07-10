@@ -85,6 +85,7 @@ cdc$Crude.Rate[cdc$Crude.Rate=="Unreliable"] <- NA
 cdc$Crude.Rate <- cdc$Crude.Rate %>% as.numeric()
 cdc <- cdc %>% mutate(long = unlist(map(cdc$geometry,1)), #get coords
                       lat = unlist(map(cdc$geometry,2)))
+
 cdc$geometry <- NULL
 
 col <- colorQuantile("YlOrRd",cdc$gas)
@@ -153,18 +154,18 @@ plume_ui <- div(
 )
 
 # Buttons ui -----------------------------------------------------------
-buttons_ui <- fluidRow( align = 'center',
-    column(3, align='center', actionButton("hide_methane_button", "Hide/show methane trends")),
-    column(3, align='center', actionButton("hide_map_button", "Hide/show map")),
-    column(3, align='center', actionButton("hide_health_button", "Hide/show health trends"))
-
-  )
+#buttons_ui <- fluidRow( align = 'center',
+#    column(3, align='center', actionButton("hide_methane_button", "Hide/show methane trends")),
+#    column(3, align='center', actionButton("hide_map_button", "Hide/show map")),
+#    column(3, align='center', actionButton("hide_health_button", "Hide/show health trends"))
+#
+#  )
 
 # Copernicus ui -----------------------------------------------------------
 copernicus_ui <- fluidRow(
 
-  conditionalPanel(
-    condition = ("input.hide_methane_button%2 == 0"),
+  #conditionalPanel(
+    #condition = ("input.hide_methane_button%2 == 0"),
     sidebarLayout(
       sidebarPanel(
       helpText("Explore methane trends by state using data from copernicus."),
@@ -185,7 +186,7 @@ copernicus_ui <- fluidRow(
         plotOutput("state_methane_trend")
       )
     )
-  )
+  #)
 )
 
 
@@ -194,8 +195,8 @@ copernicus_ui <- fluidRow(
 
 respiratory_ui <- fluidRow(
   
-  conditionalPanel(
-    condition = ("input.hide_health_button%2 == 0"),
+  #conditionalPanel(
+    #condition = ("input.hide_health_button%2 == 0"),
     sidebarLayout(
         sidebarPanel(
           helpText("Explore death rate by cause and state over time."),
@@ -220,15 +221,15 @@ respiratory_ui <- fluidRow(
           plotOutput("deathPlot")
         )
       )
-  )
+  #)
 )
 
 # Mental health UI ----------------------------------------------------------
 
 
 mh_ui <- fluidRow(
-  conditionalPanel(
-    condition = ("input.hide_map_button%2 == 0"),
+  #conditionalPanel(
+    #condition = ("input.hide_map_button%2 == 0"),
     sidebarLayout(
       sidebarPanel(
         helpText("See stress and anxiety trends across the country."),
@@ -244,7 +245,7 @@ mh_ui <- fluidRow(
         leafletOutput("mh_map")
       )
     )
-  )
+  #)
 )
 
 
@@ -293,8 +294,8 @@ ui <- navbarPage(
         a("The Substance Abuse and Mental Health Services Adminstration (SAMHSA) data store", href="https://www.samhsa.gov/data/data-we-collect/mh-cld-mental-health-client-level-data"), br(),
         p("There are many limitations to these data-sets. They have very different spatial and temporal coverage, as well as granularities. Both data from the CDC and SAMHSA focus on the United states of America."),
         p("However, despite these differences, they also share similar structures, capturing information along spatial and temporal axes.The purpose of this platform is to explore how we can begin to bring together these different sources of data to facilitate research into the relationship between methane and health."),
-        h3("Choose which data views to show:"),
-        buttons_ui,
+        #h3("Choose which data views to show:"),
+        #buttons_ui,
         hr(),
         copernicus_ui, 
         mh_ui,
@@ -430,34 +431,18 @@ server <- function(input, output) {
     col_name_2020<-colnames(mh_data)[grepl(toString(2020),colnames(mh_data))][1]
     col_name_past<-colnames(mh_data)[grepl(toString(2021-mh_trendtime()[1]),colnames(mh_data))][1]
 
-    shp_merged$normalised_change <- (shp_merged[[col_name_2020]] - shp_merged[[col_name_past]]) / as.numeric(state_pops$population) * 100000
+    shp_merged$normalised_change <- (shp_merged[[col_name_2020]] - shp_merged[[col_name_past]]) / shp_merged[[col_name_past]] * 100
 
-    shp_merged %<>% mutate(mh_cat = case_when(normalised_change < -5000 ~1,
-                                      normalised_change >= -5000 & normalised_change < -4000 ~2,
-                                      normalised_change >= -4000 & normalised_change < -3000 ~3,
-                                      normalised_change >= -3000 & normalised_change < -2000 ~4,
-                                      normalised_change >= -2000 & normalised_change < -1000 ~5,
-                                      normalised_change >= -1000 & normalised_change <0 ~6,
-                                      normalised_change >= 0 & normalised_change <1000 ~7,
-                                      normalised_change >= 1000 & normalised_change <2000 ~8,
-                                      normalised_change >= 2000 & normalised_change <3000 ~9,
-                                      normalised_change >= 3000 & normalised_change <4000 ~10,
-                                      normalised_change >= 4000 & normalised_change <5000 ~11,
-                                      normalised_change > 5000 ~12
-                                      ))
-
-    shp_merged$mh_cat <- as.factor(shp_merged$mh_cat)
-    levels(shp_merged$mh_cat) <- c("<-5000", "-5000 - -4000","-4000 - -3000","-3000 - -2000", "-2000 - -1000","-1000 - 0","0-1000","1000-2000","2000-3000", "3000-4000", "4000-5000", "5000+")
     return(shp_merged)
   })
 
   normalised_change <- reactive({mh_processed()$normalised_change})
 
-  colscale <- reactive({colorNumeric("YlOrRd", normalised_change())})
+  colscale <- reactive({colorNumeric('PRGn', normalised_change(), reverse = TRUE)})
 
   output$mh_map <- renderLeaflet({
     leaflet() %>% addTiles() %>% addPolygons(data=mh_processed(),fillColor= ~colscale()(normalised_change()),col="white",weight=1) %>%
-    addLegend(pal =colscale(), values =normalised_change(), group = "circles", position = "bottomleft",title="Trends in mental health per 100,000 people")
+    addLegend(pal =colscale(), values =normalised_change(), group = "circles", position = "bottomleft",title= paste("Percentage change in ", input$stress_anxiety, " diagnoses", sep=''), labFormat = labelFormat(suffix = "%"), na.label = "Insufficient data")
   })
   
 
