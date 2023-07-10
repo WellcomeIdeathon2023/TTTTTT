@@ -27,7 +27,6 @@ HOME_CSV <- "../../data/my_home/my_home.csv"
 RESPIRATORY_DATA <- "../../data/CDC/respiratory.txt"
 STRESS_DATA <- "../../data/Processed/traumacomplete_state.csv"
 ANXIETY_DATA <- "../../data/Processed/anxietycomplete_state.csv"
-MH_POPULATIONS <- "../../data/state_populations.csv"
 STATES_SHAPEFILE <- "../../data/Boundaries/cb_2018_us_state_20m/cb_2018_us_state_20m.shp"
 POPULATION_DATA <- "../../data/CDC/population_state_year.txt"
 STOVE_SHAPEFILE <- "../../data/Boundaries/cb_2018_us_state_20m/cb_2018_us_state_20m.shp"
@@ -393,9 +392,6 @@ server <- function(input, output) {
 
   shp <- st_read(STATES_SHAPEFILE)
   shp <- st_transform(shp,"+proj=longlat +datum=WGS84")
-
-  state_pops <- read.csv(MH_POPULATIONS, header=TRUE, stringsAsFactors = FALSE)
-  state_pops <- state_pops[order(state_pops$state_code),]
 
   # Reactive variables
   mh_trendtime <- reactive({
