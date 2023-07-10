@@ -193,42 +193,6 @@ copernicus_ui <- fluidRow(
   #)
 )
 
-
-
-# Respiratory ui ----------------------------------------------------------
-
-
-respiratory_ui <- fluidRow(
-  
-  #conditionalPanel(
-    #condition = ("input.hide_health_button%2 == 0"),
-    sidebarLayout(
-        sidebarPanel(
-          helpText("Explore death rate by cause and state over time."),
-
-          selectInput("resp_state", "Choose a state:",
-                      choices = unique(respiratory_by_state$state)),
-
-
-          selectInput("resp_cause", "Choose a cause:",
-                  choices = unique(respiratory_by_state$death_cause)),
-      
-          dateRangeInput("resp_date_range", 
-                     label = "Choose a time range:",
-                     start = min(respiratory_by_state$month), 
-                     end = max(respiratory_by_state$month))
-        ),
-
-      
-
-
-        mainPanel(
-          plotOutput("deathPlot")
-        )
-      )
-  #)
-)
-
 # Mental health UI ----------------------------------------------------------
 
 
@@ -314,13 +278,6 @@ ui <- navbarPage(
       column(
         10,
         h1("Explore methane and health data-sets"),
-
-        p("We bring together data from:"),
-        a("The Copernicus Climate data store,", href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/satellite-methane?tab=overview"), br(),
-        a("The Centers for Disease Control and Prevention (CDC) WONDER,", href="https://wonder.cdc.gov/ucd-icd10-expanded.html"), br(),
-        a("The Substance Abuse and Mental Health Services Adminstration (SAMHSA) data store", href="https://www.samhsa.gov/data/data-we-collect/mh-cld-mental-health-client-level-data"), br(),
-        p("There are many limitations to these data-sets. They have very different spatial and temporal coverage, as well as granularities. Both data from the CDC and SAMHSA focus on the United states of America."),
-        p("However, despite these differences, they also share similar structures, capturing information along spatial and temporal axes.The purpose of this platform is to explore how we can begin to bring together these different sources of data to facilitate research into the relationship between methane and health."),
         #h3("Choose which data views to show:"),
         #buttons_ui,
         hr(),
