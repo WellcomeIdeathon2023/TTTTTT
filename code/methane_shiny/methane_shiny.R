@@ -288,7 +288,14 @@ ui <- navbarPage(
     column(1),
     column(
      10,
-     h1("Explore methane and health data-sets"),
+     h1("Methane and health"),
+     p("This dashboard combines data from a number of sources (see Data) to empower
+       people to examine how methane relates to their health."),
+     h2("Leaks near you"),
+     p("In this panel, you can explore reported methane leaks in your area."),
+     h2("Healthier homes"),
+     h2("Healthcare needs planner"),
+     h2("Data"),
      p("We bring together data from:"),
      a("The Copernicus Climate data store,", href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/satellite-methane?tab=overview"), br(),
      a("The Centers for Disease Control and Prevention (CDC) WONDER,", href="https://wonder.cdc.gov/ucd-icd10-expanded.html"), br(),
