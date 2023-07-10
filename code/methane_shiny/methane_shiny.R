@@ -252,15 +252,19 @@ ui <- navbarPage(
     column(1),
     column(
      10,
-     h1("Bringing tog"),
-     h1("Methane and health"),
+     h1("Methane emissions and health outcomes"),
      p("This dashboard combines data from a number of sources (see Data) to empower
        people to examine how methane relates to their health."),
-     h2("Leaks near you"),
-     p("In this panel, you can explore reported methane leaks in your area."),
-     h2("Healthier homes"),
-     h2("Healthcare needs planner"),
-     h2("Data"),
+     h3("Leaks near you"),
+     p("In this panel, you can explore reported methane leaks in your area. 
+        Lobby your local government and see what local people are saying about pollution in your area."),
+     h3("Healthier homes"),
+     p("This panel shows the distribution of households using different types of stoves.
+      See how this relates to respiratory outcomes in your area and how this might differentially affect different groups in society."),
+     h3("Healthcare needs planner"),
+     p("In this panel, see methane emissions and health data side-by-side. 
+        See trends across time to determine how this may affect burden on the healthcare system in your area and surrounding areas."),
+     h3("Data"),
 
      p("We bring together data from:"),
      a("The Copernicus Climate data store,", href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/satellite-methane?tab=overview"), br(),
