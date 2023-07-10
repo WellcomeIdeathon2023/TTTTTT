@@ -27,7 +27,6 @@ HOME_CSV <- "../../data/my_home/my_home.csv"
 RESPIRATORY_DATA <- "../../data/CDC/respiratory.txt"
 STRESS_DATA <- "../../data/Processed/traumacomplete_state.csv"
 ANXIETY_DATA <- "../../data/Processed/anxietycomplete_state.csv"
-MH_POPULATIONS <- "../../data/state_populations.csv"
 STATES_SHAPEFILE <- "../../data/Boundaries/cb_2018_us_state_20m/cb_2018_us_state_20m.shp"
 POPULATION_DATA <- "../../data/CDC/population_state_year.txt"
 STOVE_SHAPEFILE <- "../../data/Boundaries/cb_2018_us_state_20m/cb_2018_us_state_20m.shp"
@@ -129,7 +128,6 @@ respiratory_by_state <- subset(respiratory_by_state,
 
 respiratory_by_state$month <- as.Date(respiratory_by_state$month, format = "%Y/%m/%d")
 
-
 # UI ----------------------------------------------------------------------
 
 # Plume finder ui ---------------------------------------------------------
@@ -193,6 +191,7 @@ copernicus_ui <- fluidRow(
   #)
 )
 
+
 # Mental health UI ----------------------------------------------------------
 
 
@@ -252,19 +251,25 @@ ui <- navbarPage(
     column(1),
     column(
      10,
-     h1("Methane and health"),
+     h1("Methane emissions and health outcomes"),
      p("This dashboard combines data from a number of sources (see Data) to empower
        people to examine how methane relates to their health."),
-     h2("Leaks near you"),
-     p("In this panel, you can explore reported methane leaks in your area."),
-     h2("Healthier homes"),
-     h2("Healthcare needs planner"),
-     h2("Data"),
+     h3("Leaks near you"),
+     p("In this panel, you can explore reported methane leaks in your area. 
+        Lobby your local government and see what local people are saying about pollution in your area."),
+     h3("Healthier homes"),
+     p("This panel shows the distribution of households using different types of stoves.
+      See how this relates to respiratory outcomes in your area and how this might differentially affect different groups in society."),
+     h3("Healthcare needs planner"),
+     p("In this panel, see methane emissions and health data side-by-side. 
+        See trends across time to determine how this may affect burden on the healthcare system in your area and surrounding areas."),
+     h3("Data"),
+
      p("We bring together data from:"),
      a("The Copernicus Climate data store,", href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/satellite-methane?tab=overview"), br(),
      a("The Centers for Disease Control and Prevention (CDC) WONDER,", href="https://wonder.cdc.gov/ucd-icd10-expanded.html"), br(),
      a("The Substance Abuse and Mental Health Services Adminstration (SAMHSA) data store", href="https://www.samhsa.gov/data/data-we-collect/mh-cld-mental-health-client-level-data"), br(),
-     p("There are many limitations to these data-sets. They have very different spatial and temporal coverage, as well as granularities. Both data from the CDC and SAMHSA focus on the United states of America."),
+     p("There are many limitations to these data-sets. They have very different spatial and temporal coverage, as well as granularities. Both data from the CDC and SAMHSA focus on the United States of America."),
      p("However, despite these differences, they also share similar structures, capturing information along spatial and temporal axes.The purpose of this platform is to explore how we can begin to bring together these different sources of data to facilitate research into the relationship between methane and health."),
     ),
     column(1),
@@ -278,6 +283,7 @@ ui <- navbarPage(
       column(
         10,
         h1("Explore methane and health data-sets"),
+
         #h3("Choose which data views to show:"),
         #buttons_ui,
         hr(),
@@ -386,9 +392,6 @@ server <- function(input, output) {
 
   shp <- st_read(STATES_SHAPEFILE)
   shp <- st_transform(shp,"+proj=longlat +datum=WGS84")
-
-  state_pops <- read.csv(MH_POPULATIONS, header=TRUE, stringsAsFactors = FALSE)
-  state_pops <- state_pops[order(state_pops$state_code),]
 
   # Reactive variables
   mh_trendtime <- reactive({
