@@ -148,6 +148,7 @@ respiratory_by_state$month <- as.Date(respiratory_by_state$month, format = "%Y/%
 
 plume_ui <- div(
   class="outer",
+  h3("Are there methane leaks from gas pipelines in my area?"),
   tags$head(
     # Include our custom CSS
     includeCSS("../styles.css"),
@@ -193,7 +194,9 @@ copernicus_ui <- fluidRow(
       dateRangeInput("coper_date_range", 
                   label = "Choose a time range:",
                   start = min(out_long$date),
-                  end = max(out_long$date))
+                  end = max(out_long$date)),
+      
+      p("Note: respiratory data is only available from 2018.")
     ),
       
       mainPanel(
@@ -220,6 +223,9 @@ mh_ui <- fluidRow(
 
         selectInput("mh_years", "Select a time period:",
                     choices = c("3-year trend", "5-year trend")),
+        
+        p("Anxiety: Any diagnosed anxiety disorder."),
+        p("Stress: Any diagnosed trauma or stressor-related disorder.")
       ),
 
       mainPanel(
@@ -235,6 +241,7 @@ mh_ui <- fluidRow(
 
 stove_ui <- div(
   class="outer",
+  h3("Is there a relationship between cooking with gas stoves and respiratory disease?"),
     
   tags$head(
     # Include our custom CSS
@@ -242,11 +249,11 @@ stove_ui <- div(
     includeScript("../gomap.js")
   ),
   
-  leafletOutput("stove_map",height="100%"),
+  leafletOutput("stove_map",height="90%"),
   absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
                 draggable = TRUE, top = 120, left = "auto", right = 20, bottom = "auto",
                 width = 330, height = "auto",
-                selectInput(inputId="filter",label="Select group:" ,choices = c("gender","race","children (1-14)"),selected ="race"),
+                selectInput(inputId="filter",label="Select group:" ,choices = c("gender","race","children (1-14)"),selected ="children (1-14)"),
                 plotOutput("stove_plot2",height=300*0.8 ,width = 300 ),
                 plotOutput("stove_plot3",height=200 ,width = 300 )
   )
@@ -298,13 +305,14 @@ ui <- navbarPage(
       column(1),
       column(
         10,
-        h1("Explore methane and health data-sets"),
-
+        h3("Is methane concentration correlated with respiratory disease and hospital burdens?"),
         #h3("Choose which data views to show:"),
         #buttons_ui,
         hr(),
-        copernicus_ui, 
+        copernicus_ui,
+        h3("Burden of mental health morbidity on healthcare services"),
         mh_ui,
+        h5("Mental health variables"),
       ),
       column(1),
     )
@@ -338,11 +346,11 @@ server <- function(input, output) {
   
   lab <- reactive({
     if(num() > 0){
-      lab <-paste0("There are ",num()," pipeline leaks within ", nbuffer()/1000, " km of your location. <br><br>You can lobby your \nlocal politician <b>Ms. Shelly Maine</b> to fix this issue. She can be reached at <b>1-515-616-777</b> or at <a href='shelly.main@local.gov.org'>shelly.main@local.gov.org</a>")
+      lab <-paste0("There are ",num()," leaks in pipelines operated by <b>West Gas LTD</b> within ", nbuffer()/1000, " km of your location. <br><br>You can lobby your \nlocal politician <b>Ms. Shelly Maine</b> to address this issue with the provider. She can be reached at <b>1-515-616-777</b> or at <a href='shelly.main@local.gov.org'>shelly.main@local.gov.org</a>")
     }else{
       lab <- paste0("There are no documented pipeline leaks within ", nbuffer()/1000, " km of your location <b>but this does not mean there are no methane leaks near you.</b> <br><br>Methane leak data are only available for parts of: ",
                     paste(sort(c("California", "Arizona", "Colorado", "Utah", "New Mexico", "Texas", "Lousiana", "Pennsylvania", "West Virginia", "Ohio")),collapse=", "),
-                    ". <br><br>Change the map layer to see where documented leaks are across the US. <br><br>Lobby your state representative to collect data on leaks in your state. Find your state representate: <a href='https://www.house.gov/representatives/find-your-representative'>here</a> (external website)."
+                    ". <br><br>Change the map layer to see where documented leaks are across the US. <br><br>Lobby your state representative to collect data on leaks in your state. Find your state representative: <a href='https://www.house.gov/representatives/find-your-representative'>here</a> (external website)."
       )
     }
   })
@@ -353,7 +361,7 @@ server <- function(input, output) {
   
   observeEvent(input$lon>0, {
     proxy <- leafletProxy("map")
-    proxy %>% clearMarkers() %>% clearGroup(group="Markers") # Clear existing markers
+    proxy %>% clearMarkers() %>% clearGroup(group="Tweets") # Clear existing markers
     proxy %>% setView(lat=unlist (map (pts()$geometry,2)),lng=unlist (map (pts()$geometry,1)),zoom = 9) %>%
       addTiles() %>% addCircleMarkers(data=sf_out(),radius= sf_out()$qplume) %>% addScaleBar() %>% addMeasure(primaryLengthUnit ="meters") %>%
       addMarkers(data=pts(),popup =  lab(),layerId = 10) %>% addPolygons(data=buffer(),opacity = .01)
@@ -361,13 +369,13 @@ server <- function(input, output) {
   
   # Render map --------------------------------------------------------------
   output$map <- renderLeaflet({
-    leaflet() %>% addTiles() %>% hideGroup ("Markers") %>%
+    leaflet() %>% addTiles() %>% hideGroup ("Tweets") %>%
       addCircleMarkers(data=sf_out(),radius= sf_out()$qplume) %>% addScaleBar() %>% addMeasure(primaryLengthUnit ="meters") %>%
       addMarkers(data=pts(),popup =  lab(),layerId = 10) %>% addPolygons(data=buffer(),opacity = .01) %>%
       addPopups(data=tweets,lat=~lat,lng=~lon, 
       paste0(tweets$hashtag, "<br/><br/>", tweets$text) ,
-      options = popupOptions(closeButton = T), group = "Markers") %>% 
-      addLayersControl(overlayGroups = "Markers")
+      options = popupOptions(closeButton = T), group = "Tweets") %>% 
+      addLayersControl(overlayGroups = "Tweets")
   })
   
   
@@ -447,10 +455,10 @@ server <- function(input, output) {
   normalised_change <- reactive({mh_processed()$normalised_change})
 
   colscale <- reactive({colorNumeric('PRGn', normalised_change(), reverse = TRUE)})
-
+  
   output$mh_map <- renderLeaflet({
     leaflet() %>% addTiles() %>% addPolygons(data=mh_processed(),fillColor= ~colscale()(normalised_change()),col="white",weight=1) %>%
-    addLegend(pal =colscale(), values =normalised_change(), group = "circles", position = "bottomleft",title= paste("Percentage change in ", input$stress_anxiety, " diagnoses", sep=''), labFormat = labelFormat(suffix = "%"), na.label = "Insufficient data")
+    addLegend(pal =colscale(), values =normalised_change(), group = "circles", position = "bottomleft",title= paste("Percentage change in\n ", input$stress_anxiety, " diagnoses", sep=''), labFormat = labelFormat(suffix = "%"), na.label = "Insufficient data")
   })
   
 
@@ -473,7 +481,12 @@ server <- function(input, output) {
   output$stove_map <- renderLeaflet({
     leaflet() %>% addTiles() %>% 
       setView(-88,47,  zoom = 4.4) %>%
-      addPolygons(data=stove_shp,fillColor= ~col(stove_shp$gas),col="white",weight=1,label =  paste0(round(stove_shp$gas*100,0),"% of households use gas stoves in ",stove_shp$NAME)) %>%
+      addPolygons(data=stove_shp,fillColor= ~col(stove_shp$gas),col="white",weight=1,
+                  popup =  paste0(round(stove_shp$gas*100,0),"% of households use gas stoves in ",stove_shp$NAME,"<br/>",
+                                  "<br/><i>Current Regulations:</i><br/>",
+                                  "<b>State-wide regulations:</b> New gas stoves need to be sold with a ducted hood to vent outside.<br/>",
+                                     ("<b>City-wide regulations:</b> In Santa Cruz and Bakersfield: No installation of new gas stoves in new-builds.")
+                  )) %>%
       addLegend(pal = col, values = stove_shp$gas, group = "circles", position = "bottomleft",title="Households with gas stove") %>%
       addPopups(-104,50.5,content,options=popupOptions(closeButton = T)) %>%
       addMinicharts(lng=cdc2()$long,lat=cdc2()$lat,chartdata = cdc2() %>% dplyr::select(-c(1:2)),type="pie",
