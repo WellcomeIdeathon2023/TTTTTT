@@ -1,3 +1,3 @@
 # README
 
-Any data that is loaded from your scripts (excluding data scraped/downloaded from the web) should be uploaded to this folder. Simulated data should be reproducible.
+We have added all processed and used data to this folder. 
