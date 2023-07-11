@@ -1,0 +1,124 @@
+"Notes"	"State"	"State Code"	"Single Race 6"	"Single Race 6 Code"	Deaths	Population	Crude Rate	Crude Rate Lower 95% Confidence Interval	Crude Rate Upper 95% Confidence Interval
+	"Alabama"	"01"	"Black or African American"	"2054-5"	38	1074805	3.5	2.5	4.9
+	"Alabama"	"01"	"White"	"2106-3"	37	2325734	1.6	1.1	2.2
+	"Arizona"	"04"	"American Indian or Alaska Native"	"1002-5"	11	396614	Unreliable	1.4	5.0
+	"Arizona"	"04"	"White"	"2106-3"	41	4147041	1.0	0.7	1.3
+	"Arkansas"	"05"	"Black or African American"	"2054-5"	21	426079	4.9	3.1	7.5
+	"Arkansas"	"05"	"White"	"2106-3"	29	1706051	1.7	1.1	2.4
+	"California"	"06"	"Asian"	"A"	28	3817030	0.7	0.5	1.1
+	"California"	"06"	"Black or African American"	"2054-5"	35	1833094	1.9	1.3	2.7
+	"California"	"06"	"White"	"2106-3"	160	20788885	0.8	0.7	0.9
+	"California"	"06"	"More than one race"	"M"	28	2228032	1.3	0.8	1.8
+	"Colorado"	"08"	"White"	"2106-3"	32	3414833	0.9	0.6	1.3
+	"Connecticut"	"09"	"Black or African American"	"2054-5"	16	351839	Unreliable	2.6	7.4
+	"Connecticut"	"09"	"White"	"2106-3"	15	1718691	Unreliable	0.5	1.4
+	"Florida"	"12"	"Black or African American"	"2054-5"	100	3141835	3.2	2.6	3.8
+	"Florida"	"12"	"White"	"2106-3"	95	9704025	1.0	0.8	1.2
+	"Georgia"	"13"	"Black or African American"	"2054-5"	95	2920697	3.3	2.6	4.0
+	"Georgia"	"13"	"White"	"2106-3"	45	4528284	1.0	0.7	1.3
+	"Hawaii"	"15"	"More than one race"	"M"	10	429084	Unreliable	1.1	4.3
+	"Idaho"	"16"	"White"	"2106-3"	12	1354259	Unreliable	0.5	1.5
+	"Illinois"	"17"	"Black or African American"	"2054-5"	84	1502294	5.6	4.5	6.9
+	"Illinois"	"17"	"White"	"2106-3"	76	6755275	1.1	0.9	1.4
+	"Indiana"	"18"	"Black or African American"	"2054-5"	36	630368	5.7	4.0	7.9
+	"Indiana"	"18"	"White"	"2106-3"	72	4137104	1.7	1.4	2.2
+	"Iowa"	"19"	"White"	"2106-3"	25	2064704	1.2	0.8	1.8
+	"Kansas"	"20"	"Black or African American"	"2054-5"	12	161573	Unreliable	3.8	13.0
+	"Kansas"	"20"	"White"	"2106-3"	28	1910476	1.5	1.0	2.1
+	"Kentucky"	"21"	"Black or African American"	"2054-5"	17	325491	Unreliable	3.0	8.4
+	"Kentucky"	"21"	"White"	"2106-3"	38	2771752	1.4	1.0	1.9
+	"Louisiana"	"22"	"Black or African American"	"2054-5"	54	1351849	4.0	3.0	5.2
+	"Louisiana"	"22"	"White"	"2106-3"	43	2035802	2.1	1.5	2.8
+	"Maine"	"23"	"White"	"2106-3"	13	735753	Unreliable	0.9	3.0
+	"Maryland"	"24"	"Black or African American"	"2054-5"	43	1452237	3.0	2.1	4.0
+	"Maryland"	"24"	"White"	"2106-3"	25	2374647	1.1	0.7	1.6
+	"Massachusetts"	"25"	"White"	"2106-3"	24	3268288	0.7	0.5	1.1
+	"Michigan"	"26"	"Black or African American"	"2054-5"	58	1195572	4.9	3.7	6.3
+	"Michigan"	"26"	"White"	"2106-3"	69	5147355	1.3	1.0	1.7
+	"Minnesota"	"27"	"Black or African American"	"2054-5"	21	471760	4.5	2.8	6.8
+	"Minnesota"	"27"	"White"	"2106-3"	41	3227387	1.3	0.9	1.7
+	"Mississippi"	"28"	"Black or African American"	"2054-5"	34	975627	3.5	2.4	4.9
+	"Mississippi"	"28"	"White"	"2106-3"	24	1216651	2.0	1.3	2.9
+	"Missouri"	"29"	"Black or African American"	"2054-5"	39	637536	6.1	4.4	8.4
+	"Missouri"	"29"	"White"	"2106-3"	42	3534834	1.2	0.9	1.6
+	"Nebraska"	"31"	"White"	"2106-3"	24	1310420	1.8	1.2	2.7
+	"Nevada"	"32"	"Black or African American"	"2054-5"	10	286157	Unreliable	1.7	6.4
+	"Nevada"	"32"	"White"	"2106-3"	31	1586089	2.0	1.3	2.8
+	"New Jersey"	"34"	"Black or African American"	"2054-5"	33	1091032	3.0	2.1	4.2
+	"New Jersey"	"34"	"White"	"2106-3"	41	4330583	0.9	0.7	1.3
+	"New Mexico"	"35"	"American Indian or Alaska Native"	"1002-5"	10	230913	Unreliable	2.1	8.0
+	"New Mexico"	"35"	"White"	"2106-3"	13	1187658	Unreliable	0.6	1.9
+	"New York"	"36"	"Asian"	"A"	11	1177388	Unreliable	0.5	1.7
+	"New York"	"36"	"Black or African American"	"2054-5"	96	2587302	3.7	3.0	4.5
+	"New York"	"36"	"White"	"2106-3"	99	8760463	1.1	0.9	1.4
+	"North Carolina"	"37"	"Black or African American"	"2054-5"	65	1865478	3.5	2.7	4.4
+	"North Carolina"	"37"	"White"	"2106-3"	52	4854119	1.1	0.8	1.4
+	"Ohio"	"39"	"Black or African American"	"2054-5"	65	1381243	4.7	3.6	6.0
+	"Ohio"	"39"	"White"	"2106-3"	100	6405447	1.6	1.3	1.9
+	"Oklahoma"	"40"	"Black or African American"	"2054-5"	12	270058	Unreliable	2.3	7.8
+	"Oklahoma"	"40"	"White"	"2106-3"	22	2075800	1.1	0.7	1.6
+	"Oregon"	"41"	"White"	"2106-3"	26	2343373	1.1	0.7	1.6
+	"Pennsylvania"	"42"	"Black or African American"	"2054-5"	53	1353434	3.9	2.9	5.1
+	"Pennsylvania"	"42"	"White"	"2106-3"	76	6460215	1.2	0.9	1.5
+	"South Carolina"	"45"	"Black or African American"	"2054-5"	39	1122825	3.5	2.5	4.7
+	"South Carolina"	"45"	"White"	"2106-3"	36	2286266	1.6	1.1	2.2
+	"Tennessee"	"47"	"Black or African American"	"2054-5"	38	997017	3.8	2.7	5.2
+	"Tennessee"	"47"	"White"	"2106-3"	49	3650764	1.3	1.0	1.8
+	"Texas"	"48"	"Asian"	"A"	16	1201055	Unreliable	0.8	2.2
+	"Texas"	"48"	"Black or African American"	"2054-5"	101	3300486	3.1	2.5	3.7
+	"Texas"	"48"	"White"	"2106-3"	223	18910162	1.2	1.0	1.3
+	"Utah"	"49"	"White"	"2106-3"	26	2747740	0.9	0.6	1.4
+	"Virginia"	"51"	"Black or African American"	"2054-5"	46	1317300	3.5	2.6	4.7
+	"Virginia"	"51"	"White"	"2106-3"	44	3972117	1.1	0.8	1.5
+	"Washington"	"53"	"Black or African American"	"2054-5"	10	285859	Unreliable	1.7	6.4
+	"Washington"	"53"	"White"	"2106-3"	40	4020912	1.0	0.7	1.4
+	"Washington"	"53"	"More than one race"	"M"	10	568771	Unreliable	0.8	3.2
+	"West Virginia"	"54"	"White"	"2106-3"	20	1072043	1.9	1.1	2.9
+	"Wisconsin"	"55"	"Black or African American"	"2054-5"	20	401293	5.0	3.0	7.7
+	"Wisconsin"	"55"	"White"	"2106-3"	37	3320891	1.1	0.8	1.5
+"---"
+"Dataset: Underlying Cause of Death, 2018-2021, Single Race"
+"Query Parameters:"
+"ICD-10 Codes: J00-J98 (Diseases of the respiratory system)"
+"Ten-Year Age Groups: < 1 year; 1-4 years; 5-14 years"
+"Group By: State; Single Race 6"
+"Show Totals: Disabled"
+"Show Zero Values: False"
+"Show Suppressed: False"
+"Calculate Rates Per: 100,000"
+"Rate Options: Default intercensal populations for years 2001-2009 (except Infant Age Groups)"
+"---"
+"Help: See http://wonder.cdc.gov/wonder/help/ucd-expanded.html for more information."
+"---"
+"Query Date: Jul 4, 2023 6:13:00 AM"
+"---"
+"Suggested Citation: Centers for Disease Control and Prevention, National Center for Health Statistics. National Vital Statistics"
+"System, Mortality 2018-2021 on CDC WONDER Online Database, released in 2021. Data are from the Multiple Cause of Death Files,"
+"2018-2021, as compiled from data provided by the 57 vital statistics jurisdictions through the Vital Statistics Cooperative"
+"Program. Accessed at http://wonder.cdc.gov/ucd-icd10-expanded.html on Jul 4, 2023 6:13:00 AM"
+"---"
+Messages:
+"1. Totals are not available for these results due to suppression constraints. More Information:"
+"http://wonder.cdc.gov/wonder/help/faq.html#Privacy."
+"2. Rows with zero Deaths are hidden. Use Quick Options above to show zero rows."
+"3. Rows with suppressed Deaths are hidden. Use Quick Options above to show suppressed rows."
+"---"
+Caveats:
+"1. Data are Suppressed when the data meet the criteria for confidentiality constraints. More information:"
+"http://wonder.cdc.gov/wonder/help/ucd-expanded.html#Assurance of Confidentiality."
+"2. Death rates are flagged as Unreliable when the rate is calculated with a numerator of 20 or less. More information:"
+"http://wonder.cdc.gov/wonder/help/ucd-expanded.html#Unreliable."
+"3. Deaths of persons with Age ""Not Stated"" are included in ""All"" counts and rates, but are not distributed among age groups,"
+"so are not included in age-specific counts, age-specific rates or in any age-adjusted rates. More information:"
+"http://wonder.cdc.gov/wonder/help/ucd-expanded.html#Not Stated."
+"4. The method used to calculate 95% confidence intervals is documented here: More information:"
+"http://wonder.cdc.gov/wonder/help/ucd-expanded.html#Confidence-Intervals."
+"5. The population figures for year 2021 are single-race estimates of the July 1 resident population, from the Vintage 2021"
+"postcensal series released by the Census Bureau on June 30, 2022. The population figures for year 2020 are single-race estimates"
+"of the July 1 resident population, from the Vintage 2020 postcensal series released by the Census Bureau on July 27, 2021. The"
+"population figures for year 2019 are single-race estimates of the July 1 resident population, from the Vintage 2019 postcensal"
+"series released by the Census Bureau on June 25, 2020. The population figures for year 2018 are single-race estimates of the"
+"July 1 resident population, from the Vintage 2018 postcensal series released by the Census Bureau on June 20, 2019."
+"6. The population figures used in the calculation of death rates for the age group 'under 1 year' are the estimates of the"
+"resident population that is under one year of age. More information: http://wonder.cdc.gov/wonder/help/ucd-expanded.html#Age"
+"Group."

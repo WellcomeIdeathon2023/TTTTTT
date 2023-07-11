@@ -1,0 +1,93 @@
+"Notes"	"State"	"State Code"	Deaths	Population	Crude Rate
+	"Alabama"	"01"	40	3631985	1.1
+	"Arizona"	"04"	35	5410908	0.6
+	"Arkansas"	"05"	33	2325807	1.4
+	"California"	"06"	143	29373464	0.5
+	"Colorado"	"08"	25	4143214	0.6
+	"Connecticut"	"09"	15	2361897	Unreliable
+	"Florida"	"12"	107	14076514	0.8
+	"Georgia"	"13"	72	8270932	0.9
+	"Hawaii"	"15"	12	1015966	Unreliable
+	"Idaho"	"16"	10	1497275	Unreliable
+	"Illinois"	"17"	92	9260257	1.0
+	"Indiana"	"18"	53	5196129	1.0
+	"Iowa"	"19"	21	2420092	0.9
+	"Kansas"	"20"	25	2325841	1.1
+	"Kentucky"	"21"	28	3339413	0.8
+	"Louisiana"	"22"	57	3626089	1.6
+	"Maryland"	"24"	40	4457631	0.9
+	"Massachusetts"	"25"	15	4439271	Unreliable
+	"Michigan"	"26"	86	7053997	1.2
+	"Minnesota"	"27"	46	4336201	1.1
+	"Mississippi"	"28"	32	2305790	1.4
+	"Missouri"	"29"	47	4558060	1.0
+	"Nebraska"	"31"	24	1591123	1.5
+	"Nevada"	"32"	27	2310234	1.2
+	"New Jersey"	"34"	40	6465549	0.6
+	"New Mexico"	"35"	17	1568456	Unreliable
+	"New York"	"36"	110	13438692	0.8
+	"North Carolina"	"37"	69	7604158	0.9
+	"Ohio"	"39"	98	8538378	1.1
+	"Oklahoma"	"40"	35	3181602	1.1
+	"Oregon"	"41"	14	2866302	Unreliable
+	"Pennsylvania"	"42"	75	8711804	0.9
+	"South Carolina"	"45"	38	3688980	1.0
+	"Tennessee"	"47"	52	5028156	1.0
+	"Texas"	"48"	183	24671485	0.7
+	"Utah"	"49"	22	3102233	0.7
+	"Virginia"	"51"	47	6203598	0.8
+	"Washington"	"53"	37	5569531	0.7
+	"West Virginia"	"54"	13	1185038	Unreliable
+	"Wisconsin"	"55"	36	4177864	0.9
+"Total"			2029	242316386	0.8
+"---"
+"Dataset: Underlying Cause of Death, 2018-2021, Single Race"
+"Query Parameters:"
+"ICD-10 Codes: A16-A19 (Tuberculosis); J09-J18 (Influenza and pneumonia); J20.0 (Acute bronchitis due to Mycoplasma pneumoniae);"
+"J20.1 (Acute bronchitis due to Haemophilus influenzae); J20.2 (Acute bronchitis due to streptococcus); J20.3 (Acute bronchitis"
+"due to coxsackievirus); J20.4 (Acute bronchitis due to parainfluenza virus); J20.5 (Acute bronchitis due to respiratory"
+"syncytial virus); J20.6 (Acute bronchitis due to rhinovirus); J20.7 (Acute bronchitis due to echovirus); J20.8 (Acute bronchitis"
+"due to other specified organisms); J20.9 (Acute bronchitis, unspecified); J21.0 (Acute bronchiolitis due to respiratory"
+"syncytial virus); J21.1 (Acute bronchiolitis due to human metapneumovirus); J21.8 (Acute bronchiolitis due to other specified"
+"organisms); J21.9 (Acute bronchiolitis, unspecified); J45.0 (Predominantly allergic asthma); J45.1 (Nonallergic asthma); J45.8"
+"(Mixed asthma); J45.9 (Asthma, unspecified)"
+"Ten-Year Age Groups: < 1 year; 1-4 years; 5-14 years"
+"Group By: State"
+"Show Totals: True"
+"Show Zero Values: False"
+"Show Suppressed: False"
+"Calculate Rates Per: 100,000"
+"Rate Options: Default intercensal populations for years 2001-2009 (except Infant Age Groups)"
+"---"
+"Help: See http://wonder.cdc.gov/wonder/help/ucd-expanded.html for more information."
+"---"
+"Query Date: Jul 7, 2023 7:06:41 AM"
+"---"
+"Suggested Citation: Centers for Disease Control and Prevention, National Center for Health Statistics. National Vital Statistics"
+"System, Mortality 2018-2021 on CDC WONDER Online Database, released in 2021. Data are from the Multiple Cause of Death Files,"
+"2018-2021, as compiled from data provided by the 57 vital statistics jurisdictions through the Vital Statistics Cooperative"
+"Program. Accessed at http://wonder.cdc.gov/ucd-icd10-expanded.html on Jul 7, 2023 7:06:41 AM"
+"---"
+Messages:
+"1. Rows with suppressed Deaths are hidden, but the Deaths and Population values in those rows are included in the totals. Use"
+"Quick Options above to show suppressed rows."
+"---"
+Caveats:
+"1. Data are Suppressed when the data meet the criteria for confidentiality constraints. More information:"
+"http://wonder.cdc.gov/wonder/help/ucd-expanded.html#Assurance of Confidentiality."
+"2. Death rates are flagged as Unreliable when the rate is calculated with a numerator of 20 or less. More information:"
+"http://wonder.cdc.gov/wonder/help/ucd-expanded.html#Unreliable."
+"3. Deaths of persons with Age ""Not Stated"" are included in ""All"" counts and rates, but are not distributed among age groups,"
+"so are not included in age-specific counts, age-specific rates or in any age-adjusted rates. More information:"
+"http://wonder.cdc.gov/wonder/help/ucd-expanded.html#Not Stated."
+"4. The population figures for year 2021 are single-race estimates of the July 1 resident population, from the Vintage 2021"
+"postcensal series released by the Census Bureau on June 30, 2022. The population figures for year 2020 are single-race estimates"
+"of the July 1 resident population, from the Vintage 2020 postcensal series released by the Census Bureau on July 27, 2021. The"
+"population figures for year 2019 are single-race estimates of the July 1 resident population, from the Vintage 2019 postcensal"
+"series released by the Census Bureau on June 25, 2020. The population figures for year 2018 are single-race estimates of the"
+"July 1 resident population, from the Vintage 2018 postcensal series released by the Census Bureau on June 20, 2019."
+"5. The population figures used in the calculation of death rates for the age group 'under 1 year' are the estimates of the"
+"resident population that is under one year of age. More information: http://wonder.cdc.gov/wonder/help/ucd-expanded.html#Age"
+"Group."
+"6. Changes to cause of death classification affect reporting trends. More information:"
+"http://wonder.cdc.gov/wonder/help/ucd-expanded.html#ICD-10 Changes."
