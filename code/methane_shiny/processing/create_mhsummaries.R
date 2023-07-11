@@ -2,11 +2,11 @@ library(dplyr)
 library(stringr)
 
 # Read in mental health data
-mh2020 <- read.csv("../data/mental_health/mhcld-puf-2020-csv.csv", header=TRUE, stringsAsFactors = FALSE)
-mh2019 <- read.csv("../data/mental_health/mhcld-puf-2019-csv.csv", header=TRUE, stringsAsFactors = FALSE)
-mh2018 <- read.csv("../data/mental_health/mhcld-puf-2018-csv.csv", header=TRUE, stringsAsFactors = FALSE)
-mh2017 <- read.csv("../data/mental_health/mhcld-puf-2017-csv.csv", header=TRUE, stringsAsFactors = FALSE)
-mh2016 <- read.csv("../data/mental_health/mhcld-puf-2016-csv.csv", header=TRUE, stringsAsFactors = FALSE)
+mh2020 <- read.csv("../../../data/mental_health/mhcld-puf-2020-csv.csv", header=TRUE, stringsAsFactors = FALSE)
+mh2019 <- read.csv("../../../data/mental_health/mhcld-puf-2019-csv.csv", header=TRUE, stringsAsFactors = FALSE)
+mh2018 <- read.csv("../../../data/mental_health/mhcld-puf-2018-csv.csv", header=TRUE, stringsAsFactors = FALSE)
+mh2017 <- read.csv("../../../data/mental_health/mhcld-puf-2017-csv.csv", header=TRUE, stringsAsFactors = FALSE)
+mh2016 <- read.csv("../../../data/mental_health/mhcld-puf-2016-csv.csv", header=TRUE, stringsAsFactors = FALSE)
 
 # Create dataframe of counts by state [state is STATEFIP, number of mental health diagnoses is NUMMHS]
 # Other interesting variables to look at could be TRAUSTREFLG (trauma and stress related disorders) or ANXIETYFLG (anxiety disorders)
