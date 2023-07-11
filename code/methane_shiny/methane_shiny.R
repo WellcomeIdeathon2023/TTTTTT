@@ -300,8 +300,13 @@ ui <- navbarPage(
         #h3("Choose which data views to show:"),
         #buttons_ui,
         hr(),
-        copernicus_ui, 
+        copernicus_ui,
+        p("Note: respiratory data is only available from 2018."),
+        h3("Burden of mental health morbidity on healthcare services"),
         mh_ui,
+        h5("Mental health variables"),
+        p("<b>Anxiety</b>: Any diagnosed anxiety disorder."),
+        p("<b>Stress</b>: Any diagnosed trauma or stressor-related disorder.")
       ),
       column(1),
     )
@@ -447,7 +452,7 @@ server <- function(input, output) {
 
   output$mh_map <- renderLeaflet({
     leaflet() %>% addTiles() %>% addPolygons(data=mh_processed(),fillColor= ~colscale()(normalised_change()),col="white",weight=1) %>%
-    addLegend(pal =colscale(), values =normalised_change(), group = "circles", position = "bottomleft",title= paste("Percentage change in ", input$stress_anxiety, " diagnoses", sep=''), labFormat = labelFormat(suffix = "%"), na.label = "Insufficient data")
+    addLegend(pal =colscale(), values =normalised_change(), group = "circles", position = "bottomleft",title= paste("Percentage change in\n ", input$stress_anxiety, " diagnoses", sep=''), labFormat = labelFormat(suffix = "%"), na.label = "Insufficient data")
   })
   
 
