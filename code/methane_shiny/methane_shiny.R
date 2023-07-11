@@ -277,7 +277,7 @@ ui <- navbarPage(
      h3("Leaks near you"),
      p("In this panel, you can explore reported methane leaks in your area. 
         Lobby your local government and see what local people are saying about pollution in your area."),
-     h3("Healthier homes"),
+     h3("Healthier homes for everyone"),
      p("This panel shows the distribution of households using different types of stoves.
       See how this relates to respiratory outcomes in your area and how this might differentially affect different groups in society."),
      h3("Healthcare needs planner"),
@@ -298,7 +298,7 @@ ui <- navbarPage(
     column(1),
   ),
   tabPanel("Leaks near you", plume_ui),
-  tabPanel("Healthier homes", stove_ui),
+  tabPanel("Healthier homes for everyone", stove_ui),
   tabPanel(
     "Healthcare needs planner", 
     fluidRow(
@@ -441,6 +441,7 @@ server <- function(input, output) {
     mh_data$GEOID <- str_pad(mh_data$GEOID, 2, pad = "0")
     shp_merged <- merge(shp, mh_data, by.x="GEOID", by.y="GEOID", all=TRUE)
     shp_merged <- shp_merged[order(shp_merged$GEOID),]
+    shp_merged <- shp_merged %>% filter(NAME!="Hawaii" & NAME!="Alaska" )
 
     shp_merged <- shp_merged[-c(53), ]
     col_name_2020<-colnames(mh_data)[grepl(toString(2020),colnames(mh_data))][1]
@@ -457,7 +458,7 @@ server <- function(input, output) {
   
   output$mh_map <- renderLeaflet({
     leaflet() %>% addTiles() %>% addPolygons(data=mh_processed(),fillColor= ~colscale()(normalised_change()),col="white",weight=1) %>%
-    addLegend(pal =colscale(), values =normalised_change(), group = "circles", position = "bottomleft",title= paste("Percentage change in\n ", input$stress_anxiety, " diagnoses", sep=''), labFormat = labelFormat(suffix = "%"), na.label = "Insufficient data")
+    addLegend(pal =colscale(), values =normalised_change(), group = "circles", position = "bottomright",title= paste("Percentage change in<br> ", input$stress_anxiety, " diagnoses", sep=''), labFormat = labelFormat(suffix = "%"), na.label = "Insufficient data")
   })
   
 
