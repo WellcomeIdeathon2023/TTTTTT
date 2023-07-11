@@ -223,7 +223,7 @@ mh_ui <- fluidRow(
 
         selectInput("mh_years", "Select a time period:",
                     choices = c("3-year trend", "5-year trend")),
-        
+        h5("Mental health variables"),
         p("Anxiety: Any diagnosed anxiety disorder."),
         p("Stress: Any diagnosed trauma or stressor-related disorder.")
       ),
@@ -312,7 +312,6 @@ ui <- navbarPage(
         copernicus_ui,
         h3("Burden of mental health morbidity on healthcare services"),
         mh_ui,
-        h5("Mental health variables"),
       ),
       column(1),
     )
