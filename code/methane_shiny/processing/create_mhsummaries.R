@@ -29,25 +29,25 @@ anxiety2017_state <- mh2017 %>% group_by(STATEFIP) %>% summarise(anxiety = sum(A
 anxiety2016_state <- mh2016 %>% group_by(STATEFIP) %>% summarise(anxiety = sum(ANXIETYFLG))
 
 # Read in summaries from saved files
-mh2020_state <- read.csv("../data/mental_health_summaries/mh2020_state.csv", header=TRUE, stringsAsFactors = FALSE)
-mh2019_state <- read.csv("../data/mental_health_summaries/mh2019_state.csv", header=TRUE, stringsAsFactors = FALSE)
-mh2018_state <- read.csv("../data/mental_health_summaries/mh2018_state.csv", header=TRUE, stringsAsFactors = FALSE)
-mh2017_state <- read.csv("../data/mental_health_summaries/mh2017_state.csv", header=TRUE, stringsAsFactors = FALSE)
-mh2016_state <- read.csv("../data/mental_health_summaries/mh2016_state.csv", header=TRUE, stringsAsFactors = FALSE)
+mh2020_state <- read.csv("../../../data/mental_health_summaries/mh2020_state.csv", header=TRUE, stringsAsFactors = FALSE)
+mh2019_state <- read.csv("../../../data/mental_health_summaries/mh2019_state.csv", header=TRUE, stringsAsFactors = FALSE)
+mh2018_state <- read.csv("../../../data/mental_health_summaries/mh2018_state.csv", header=TRUE, stringsAsFactors = FALSE)
+mh2017_state <- read.csv("../../../data/mental_health_summaries/mh2017_state.csv", header=TRUE, stringsAsFactors = FALSE)
+mh2016_state <- read.csv("../../../data/mental_health_summaries/mh2016_state.csv", header=TRUE, stringsAsFactors = FALSE)
 
-trauma2020_state <- read.csv("../data/mental_health_summaries/trauma2020_state.csv", header=TRUE, stringsAsFactors = FALSE)
-trauma2019_state <- read.csv("../data/mental_health_summaries/trauma2019_state.csv", header=TRUE, stringsAsFactors = FALSE)
-trauma2018_state <- read.csv("../data/mental_health_summaries/trauma2018_state.csv", header=TRUE, stringsAsFactors = FALSE)
-trauma2017_state <- read.csv("../data/mental_health_summaries/trauma2017_state.csv", header=TRUE, stringsAsFactors = FALSE)
-trauma2016_state <- read.csv("../data/mental_health_summaries/trauma2016_state.csv", header=TRUE, stringsAsFactors = FALSE)
+trauma2020_state <- read.csv("../../../data/mental_health_summaries/trauma2020_state.csv", header=TRUE, stringsAsFactors = FALSE)
+trauma2019_state <- read.csv("../../../data/mental_health_summaries/trauma2019_state.csv", header=TRUE, stringsAsFactors = FALSE)
+trauma2018_state <- read.csv("../../../data/mental_health_summaries/trauma2018_state.csv", header=TRUE, stringsAsFactors = FALSE)
+trauma2017_state <- read.csv("../../../data/mental_health_summaries/trauma2017_state.csv", header=TRUE, stringsAsFactors = FALSE)
+trauma2016_state <- read.csv("../../../data/mental_health_summaries/trauma2016_state.csv", header=TRUE, stringsAsFactors = FALSE)
 
-anxiety2020_state <- read.csv("../data/mental_health_summaries/anxiety2020_state.csv", header=TRUE, stringsAsFactors = FALSE)
-anxiety2019_state <- read.csv("../data/mental_health_summaries/anxiety2019_state.csv", header=TRUE, stringsAsFactors = FALSE)
-anxiety2018_state <- read.csv("../data/mental_health_summaries/anxiety2018_state.csv", header=TRUE, stringsAsFactors = FALSE)
-anxiety2017_state <- read.csv("../data/mental_health_summaries/anxiety2017_state.csv", header=TRUE, stringsAsFactors = FALSE)
-anxiety2016_state <- read.csv("../data/mental_health_summaries/anxiety2016_state.csv", header=TRUE, stringsAsFactors = FALSE)
+anxiety2020_state <- read.csv("../../../data/mental_health_summaries/anxiety2020_state.csv", header=TRUE, stringsAsFactors = FALSE)
+anxiety2019_state <- read.csv("../../../data/mental_health_summaries/anxiety2019_state.csv", header=TRUE, stringsAsFactors = FALSE)
+anxiety2018_state <- read.csv("../../../data/mental_health_summaries/anxiety2018_state.csv", header=TRUE, stringsAsFactors = FALSE)
+anxiety2017_state <- read.csv("../../../data/mental_health_summaries/anxiety2017_state.csv", header=TRUE, stringsAsFactors = FALSE)
+anxiety2016_state <- read.csv("../../../data/mental_health_summaries/anxiety2016_state.csv", header=TRUE, stringsAsFactors = FALSE)
 
-shp <- st_read("../data/Boundaries/cb_2018_us_state_20m/cb_2018_us_state_20m.shp")
+shp <- st_read("../../data/Boundaries/cb_2018_us_state_20m/cb_2018_us_state_20m.shp")
 shp <- st_transform(shp,"+proj=longlat +datum=WGS84")
 
 # Merge states for consistency among datasets
@@ -144,6 +144,6 @@ mhcomplete_state$mh_change <- mh2020_state$NUMMHS - mh2018_state$NUMMHS
 traumacomplete_state$trauma_change <- trauma2020_state$TRAUMA - trauma2018_state$TRAUMA
 anxietycomplete_state$anxiety_change <- anxiety2020_state$anxiety - anxiety2018_state$anxiety
 
-write.csv(mhcomplete_state, "../data/mental_health_summaries/mhcomplete_state.csv")
-write.csv(traumacomplete_state, "../data/mental_health_summaries/traumacomplete_state.csv")
-write.csv(anxietycomplete_state, "../data/mental_health_summaries/anxietycomplete_state.csv")
+write.csv(mhcomplete_state, "../../../data/Processed/mental_health_summaries/mhcomplete_state.csv")
+write.csv(traumacomplete_state, "../../../data/Processed/mental_health_summaries/traumacomplete_state.csv")
+write.csv(anxietycomplete_state, "../../../data/Processed/mental_health_summaries/anxietycomplete_state.csv")
