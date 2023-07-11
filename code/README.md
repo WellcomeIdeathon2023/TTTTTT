@@ -5,6 +5,8 @@ This dashboard brings together health and climate data to explore health effects
 
 Our dashboard is built using R Shiny. 
 
+More information on the data is provided in the `data/READMDE.md`. 
+
 # Installation and requirements
 A recent verison of R: version >= 4.2.1 
 It requires the following packages to run:
